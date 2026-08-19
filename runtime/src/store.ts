@@ -33,5 +33,20 @@ export class RuntimeStore {
     }
   }
 
+  isLanguageEnabled(language: string): boolean {
+    const row = this.db.prepare("SELECT value FROM runtime_meta WHERE key = ?").get(`language:${language}`) as { value?: string } | undefined;
+    return row?.value === "enabled";
+  }
+
+  setLanguageEnabled(language: string, enabled: boolean): void {
+    this.db.prepare("INSERT INTO runtime_meta(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value")
+      .run(`language:${language}`, enabled ? "enabled" : "disabled");
+    this.audit("code.language.policy", { language, enabled });
+  }
+
+  listLanguagePolicies(languages: readonly string[]): Record<string, boolean> {
+    return Object.fromEntries(languages.map((language) => [language, this.isLanguageEnabled(language)]));
+  }
+
   close(): void { this.db.close(); }
 }

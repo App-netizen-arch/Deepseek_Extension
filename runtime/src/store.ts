@@ -45,6 +45,14 @@ export class RuntimeStore {
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS math_documents (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        source_path TEXT NOT NULL,
+        document_json TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `);
   }
   audit(eventType: string, payload: unknown): void {
@@ -80,8 +88,21 @@ export class RuntimeStore {
   getWebSession(name: string): { name: string; state_ciphertext: string; expires_at: string } | undefined { return this.db.prepare("SELECT name,state_ciphertext,expires_at FROM web_sessions WHERE name=?").get(name) as any; }
   listWebSessions(): Array<{ name: string; expires_at: string }> { return this.db.prepare("SELECT name,expires_at FROM web_sessions ORDER BY name").all() as any; }
   deleteWebSession(name: string): boolean { return this.db.prepare("DELETE FROM web_sessions WHERE name=?").run(name).changes > 0; }
-  createApproval(id: string, taskId: string, action: string, target: string, expiresAt: string): void { const now = new Date().toISOString(); this.db.prepare("INSERT INTO approvals(id,task_id,action,target,expires_at,status,created_at,updated_at) VALUES(?,?,?,?,?, 'pending',?,?)").run(id, taskId, action, target, expiresAt, now, now); }
+  createApproval(id: string, taskId: string, action: string, target: string, expiresAt: string): void { const now = new Date().toISOString(); this.db.prepare("INSERT INTO approvals(id,task_id,action,target,expires_at,status,created_at,updated_at) VALUES(?,?,?,?,?, 'pending',?,?)").run(id,taskId,action,target,expiresAt,now,now); }
   getApproval(id: string): any { return this.db.prepare("SELECT * FROM approvals WHERE id=?").get(id); }
-  decideApproval(id: string, status: "approved" | "denied"): boolean { return this.db.prepare("UPDATE approvals SET status=?,updated_at=? WHERE id=? AND status='pending'").run(status, new Date().toISOString(), id).changes > 0; }
+  decideApproval(id: string, status: "approved" | "denied"): boolean { return this.db.prepare("UPDATE approvals SET status=?,updated_at=? WHERE id=? AND status='pending'").run(status,new Date().toISOString(),id).changes > 0; }
+  upsertMathDocument(id: string, title: string, sourcePath: string, document: unknown): void {
+    const now = new Date().toISOString();
+    this.db.prepare(`INSERT INTO math_documents(id,title,source_path,document_json,created_at,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,source_path=excluded.source_path,document_json=excluded.document_json,updated_at=excluded.updated_at`).run(id,title,sourcePath,JSON.stringify(document),now,now);
+  }
+  getMathDocument(id: string): { id: string; title: string; source_path: string; document: any } | undefined {
+    const row = this.db.prepare("SELECT id,title,source_path,document_json FROM math_documents WHERE id=?").get(id) as any;
+    if (!row) return undefined;
+    return { id: row.id, title: row.title, source_path: row.source_path, document: JSON.parse(row.document_json) };
+  }
+  listMathDocuments(limit = 100): Array<{ id: string; title: string; source_path: string; updated_at: string }> {
+    return this.db.prepare("SELECT id,title,source_path,updated_at FROM math_documents ORDER BY updated_at DESC LIMIT ?").all(Math.min(limit,100)) as any;
+  }
+  deleteMathDocument(id: string): boolean { return this.db.prepare("DELETE FROM math_documents WHERE id=?").run(id).changes > 0; }
   close(): void { this.db.close(); }
 }

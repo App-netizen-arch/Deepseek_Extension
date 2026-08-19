@@ -1,18 +1,17 @@
-# Better DeepSeek Local Runtime — Phase 2
+# Better DeepSeek Local Runtime — Phase 4
 
-This directory contains the local-first runtime required by the Better DeepSeek agent architecture, including the native Code Agent and read-only Web Agent MVP.
+This directory contains the local-first runtime required by the Better DeepSeek agent architecture, including the native Code Agent, Web Agent MVP, MathBridge MVP, and the first production Web Agent layer.
 
 ## Security boundary
 
 - Listens only on `127.0.0.1`.
 - Every authenticated REST request uses `Authorization: Bearer <token>`.
-- WebSocket clients authenticate with a token in their first message; unauthenticated sockets are closed after 5 seconds.
-- The runtime never binds to `0.0.0.0` and does not expose a public API.
+- WebSocket clients authenticate in their first message; unauthenticated sockets are closed after 5 seconds.
+- The runtime never binds to `0.0.0.0`.
 - SQLite state and audit data stay under `runtime/data/` and are ignored by Git.
 - No telemetry or cloud upload is implemented by the runtime by default.
-- Code execution uses a server-side language allowlist and argument arrays only.
-- The Web Agent is read-only: it does not log in, submit forms, post, solve CAPTCHAs, bypass paywalls, or modify remote content.
-- Web pages are untrusted input and are never treated as tool commands.
+- Web content is untrusted input and never becomes a tool command.
+- Critical actions such as login, payments, posting, and account changes remain outside autonomous execution.
 
 ## Setup
 
@@ -22,64 +21,101 @@ npm install
 npx playwright install chromium
 TOKEN=$(node scripts/setup-token.mjs)
 export BDS_RUNTIME_TOKEN="$TOKEN"
+export BDS_SESSION_KEY="$(openssl rand -hex 32)"
 export BDS_WORKSPACE="/absolute/path/to/your/project"
 npm run build
 npm start
 ```
 
-`setup-token` intentionally prints the token instead of writing it to disk. Keep the token local and store it only in the existing Better DeepSeek extension's `chrome.storage.local` through the runtime bridge.
+`setup-token` prints the token instead of writing it to disk. Keep both the runtime token and session key local. The extension stores only the runtime bearer token in `chrome.storage.local`.
 
-Optional environment variables:
+## Production Web Agent
 
-```text
-BDS_RUNTIME_PORT=3037
-BDS_RUNTIME_TOKEN=<32+ character token>
-BDS_RUNTIME_DB=./data/runtime.db
-BDS_WORKSPACE=/absolute/path/to/project
-```
-
-## Web Agent MVP
-
-DeepSeek can emit:
+The production API follows the specification:
 
 ```text
-BDS:WEB_AGENT
-goal = "Compare recent protein folding models after AlphaFold 3"
-max_pages = 10
-max_depth = 2
-time_budget = 15
-output_mode = "summary"
+POST   /tasks
+GET    /tasks/:id
+GET    /tasks/:id/events
+POST   /tasks/:id/pause
+POST   /tasks/:id/resume
+POST   /tasks/:id/cancel
+POST   /approvals/:id
+GET    /sessions
+POST   /sessions
+POST   /sessions/:name/save
+DELETE /sessions/:name
+WS     /ws
 ```
 
-The runtime launches a headless Chromium instance through Playwright, uses a public search page when no `start_url` is provided, renders JavaScript, extracts readable page text, records citations, follows relevant public links, and stops at the configured page/depth/time budget. Each citation contains the source URL, title, access time, and an excerpt taken from the rendered page.
+Task example:
 
-Web Agent limits are capped at 25 pages, depth 3, 20 minutes per task, and 10 requests per domain per minute. `robots.txt`, `noindex`, and `nofollow` are honored where detectable. Failed or blocked pages are recorded and skipped rather than failing the entire task.
+```json
+{
+  "goal": "Find three independent sources about X",
+  "start_url": "https://example.com",
+  "max_pages": 20,
+  "max_depth": 3,
+  "time_budget_minutes": 20,
+  "interaction_level": "click",
+  "allowed_domains": ["example.com"],
+  "blocked_domains": ["social.example"]
+}
+```
 
-The MVP synthesis is local and deterministic: it ranks collected evidence against the research goal and assembles a cited evidence summary. No remote LLM call is required to run the browser agent.
+### Interaction levels
 
-## Web Agent endpoints
+- `read-only` — default; open pages and extract content.
+- `click` — may click low-risk expanders, pagination, and similar controls.
+- `fill-forms` — search-field filling requires an explicit local approval. The runtime never submits forms automatically.
+
+### Persistent sessions
+
+Create a visible login session:
 
 ```text
-GET  /v1/status                       authenticated
-POST /v1/web/start                    authenticated
-GET  /v1/web/status/:task_id          authenticated
-POST /v1/web/cancel                   authenticated
-WS   /ws                              authenticated after first message
+POST /sessions
+{"name":"example-account"}
 ```
 
-WebSocket messages:
+A normal browser window opens for the user to log in manually. The runtime never receives or stores the password. When the user is finished:
 
 ```text
-{"type":"web/start","payload":{"goal":"...","max_pages":10,"max_depth":2,"time_budget_minutes":15}}
-{"type":"web/cancel","payload":{"task_id":"web-..."}}
+POST /sessions/example-account/save
 ```
 
-The runtime streams `web/event` messages for task start, page visits, skipped pages, completion, and cancellation. Completion includes the synthesized answer and citations.
+The browser storage state is encrypted locally with AES-256-GCM before it is written to SQLite. The session is later reusable by a production task through `session_name`. Sessions can be revoked with `DELETE /sessions/:name`.
 
-## Code Agent MVP
+### Checkpointing and background jobs
 
-The Phase 1 `BDS:LOCAL_EXEC` implementation remains available with explicit language enablement, argument-array execution, 15-second one-shot timeouts, output limits, process cleanup, and SQLite audit events.
+Production tasks run in the local runtime rather than inside the extension popup. The task queue, visited URLs, and collected source records are checkpointed to SQLite after each page. A disconnected extension can reconnect and inspect `/tasks/:id`. A paused persisted task can be resumed after the runtime restarts by calling `/tasks/:id/resume`.
 
-## Chrome integration overlay
+Every page/action is recorded in the audit log and can be retrieved through `/tasks/:id/events`.
 
-`../extension-integration/` contains the drop-in runtime client, tag bridge, and status UI intended to be imported into the existing Better DeepSeek MV3 extension. The UI now renders Web Agent progress and source links. This remains an integration overlay, not a replacement extension.
+### Safety and approvals
+
+The production agent respects `robots.txt`, `noindex`, `nofollow`, domain allow/block lists, and the per-domain rate limit. It never solves CAPTCHAs, bypasses paywalls, submits credentials, posts messages, performs payments, or makes account changes automatically.
+
+`fill-forms` creates a five-minute approval request. Approve or deny it with:
+
+```text
+POST /approvals/<approval_id>
+{"decision":"approved"}
+```
+
+An expired or denied approval prevents the form-fill action.
+
+## Existing MVP endpoints
+
+The previous endpoints remain available:
+
+```text
+POST /v1/web/start
+GET  /v1/web/status/:task_id
+POST /v1/web/cancel
+POST /v1/code/execute
+POST /v1/math/analyze
+WS   /ws
+```
+
+The Phase 1 Code Agent and Phase 3 MathBridge security boundaries remain unchanged.

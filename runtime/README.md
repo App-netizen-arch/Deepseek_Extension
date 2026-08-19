@@ -1,6 +1,6 @@
 # Better DeepSeek Local Runtime — Phase 4
 
-This directory contains the local-first runtime required by the Better DeepSeek agent architecture, including the native Code Agent, Web Agent MVP, MathBridge MVP, and the first production Web Agent layer.
+This directory contains the local-first runtime required by the Better DeepSeek agent architecture, including the native Code Agent, Web Agent MVP/production layer, MathBridge MVP, and MathBridge production document pipeline.
 
 ## Security boundary
 
@@ -10,8 +10,9 @@ This directory contains the local-first runtime required by the Better DeepSeek 
 - The runtime never binds to `0.0.0.0`.
 - SQLite state and audit data stay under `runtime/data/` and are ignored by Git.
 - No telemetry or cloud upload is implemented by the runtime by default.
-- Web content is untrusted input and never becomes a tool command.
-- Critical actions such as login, payments, posting, and account changes remain outside autonomous execution.
+- Web content and document contents are untrusted input and never become tool commands.
+- PDFs are accepted only from the configured local `BDS_DOCUMENT_ROOT` (or workspace) and sensitive paths are rejected.
+- Math documents remain local and can be deleted from the MathIR store.
 
 ## Setup
 
@@ -23,11 +24,76 @@ TOKEN=$(node scripts/setup-token.mjs)
 export BDS_RUNTIME_TOKEN="$TOKEN"
 export BDS_SESSION_KEY="$(openssl rand -hex 32)"
 export BDS_WORKSPACE="/absolute/path/to/your/project"
+export BDS_DOCUMENT_ROOT="/absolute/path/to/papers"
 npm run build
 npm start
 ```
 
-`setup-token` prints the token instead of writing it to disk. Keep both the runtime token and session key local. The extension stores only the runtime bearer token in `chrome.storage.local`.
+For MathBridge PDF ingestion, install the local Python tooling you intend to use. The production adapter prefers Docling v2, then Marker, then PyMuPDF for born-digital fallback. No document is uploaded by the runtime.
+
+## MathBridge production
+
+### PDF → MathIR
+
+```text
+BDS:MATH_PDF
+  file = "/absolute/path/to/papers/paper.pdf"
+  mode = "full"
+  output = "mathir"
+```
+
+REST:
+
+```text
+POST /v1/math/pdf
+GET  /v1/math/documents
+GET  /v1/math/documents/:id
+DELETE /v1/math/documents/:id
+```
+
+The resulting MathIR stores document metadata, semantic sections, equations, theorem-like structures, figures, tables, references, relations, page provenance, and bounding boxes when the upstream extractor exposes them.
+
+### MathIR reasoning
+
+```text
+BDS:MATH_ASK
+  document_id = "doc_001"
+  question = "Explain the proof of Theorem 5.2"
+```
+
+REST:
+
+```text
+POST /v1/math/ask
+```
+
+The runtime retrieves only relevant MathIR entities and their dependencies. If `BDS_DEEPSEEK_API_URL` and `BDS_DEEPSEEK_API_KEY` are configured, only the retrieved MathIR context is sent to that endpoint; the original PDF is not sent. Without those variables, the runtime returns a deterministic local-context answer.
+
+### Equation OCR
+
+The existing MVP API remains available:
+
+```text
+POST /v1/math/analyze
+```
+
+It supports LaTeX, MathML, and local image OCR through pix2tex/Pix2Text, followed by KaTeX validation/rendering.
+
+### TikZ validation and rendering
+
+```text
+BDS:TIKZ_RENDER
+  source = "\\begin{tikzpicture}..."
+  output = "svg"
+```
+
+REST:
+
+```text
+POST /v1/math/tikz
+```
+
+The runtime compiles TikZ locally with `pdflatex` using `-no-shell-escape` and converts the validated PDF to SVG with `dvisvgm`. File/process primitives such as `\\input`, `\\include`, `\\openin`, `\\write18`, and shell escape are rejected before compilation.
 
 ## Production Web Agent
 
@@ -48,66 +114,7 @@ DELETE /sessions/:name
 WS     /ws
 ```
 
-Task example:
-
-```json
-{
-  "goal": "Find three independent sources about X",
-  "start_url": "https://example.com",
-  "max_pages": 20,
-  "max_depth": 3,
-  "time_budget_minutes": 20,
-  "interaction_level": "click",
-  "allowed_domains": ["example.com"],
-  "blocked_domains": ["social.example"]
-}
-```
-
-### Interaction levels
-
-- `read-only` — default; open pages and extract content.
-- `click` — may click low-risk expanders, pagination, and similar controls.
-- `fill-forms` — search-field filling requires an explicit local approval. The runtime never submits forms automatically.
-
-### Persistent sessions
-
-Create a visible login session:
-
-```text
-POST /sessions
-{"name":"example-account"}
-```
-
-A normal browser window opens for the user to log in manually. The runtime never receives or stores the password. When the user is finished:
-
-```text
-POST /sessions/example-account/save
-```
-
-The browser storage state is encrypted locally with AES-256-GCM before it is written to SQLite. The session is later reusable by a production task through `session_name`. Sessions can be revoked with `DELETE /sessions/:name`.
-
-### Checkpointing and background jobs
-
-Production tasks run in the local runtime rather than inside the extension popup. The task queue, visited URLs, and collected source records are checkpointed to SQLite after each page. A disconnected extension can reconnect and inspect `/tasks/:id`. A paused persisted task can be resumed after the runtime restarts by calling `/tasks/:id/resume`.
-
-Every page/action is recorded in the audit log and can be retrieved through `/tasks/:id/events`.
-
-### Safety and approvals
-
-The production agent respects `robots.txt`, `noindex`, `nofollow`, domain allow/block lists, and the per-domain rate limit. It never solves CAPTCHAs, bypasses paywalls, submits credentials, posts messages, performs payments, or makes account changes automatically.
-
-`fill-forms` creates a five-minute approval request. Approve or deny it with:
-
-```text
-POST /approvals/<approval_id>
-{"decision":"approved"}
-```
-
-An expired or denied approval prevents the form-fill action.
-
 ## Existing MVP endpoints
-
-The previous endpoints remain available:
 
 ```text
 POST /v1/web/start
@@ -117,5 +124,3 @@ POST /v1/code/execute
 POST /v1/math/analyze
 WS   /ws
 ```
-
-The Phase 1 Code Agent and Phase 3 MathBridge security boundaries remain unchanged.

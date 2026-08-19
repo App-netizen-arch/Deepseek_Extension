@@ -30,7 +30,7 @@ jobs:
       - name: Install Chromium
         working-directory: runtime
         run: npx playwright install --with-deps chromium
-      - name: Start runtime and run Chrome E2E
+      - name: Start runtime and run Chrome/security E2E
         env:
           BDS_RUNTIME_TOKEN: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           BDS_RUNTIME_DB: ${{ runner.temp }}/bds-e2e.db
@@ -39,13 +39,11 @@ jobs:
         run: |
           node runtime/dist/index.js > /tmp/bds-runtime.log 2>&1 &
           pid=$!
-          trap 'kill $pid 2>/dev/null || true' EXIT
+          trap 'kill -TERM $pid 2>/dev/null || true; wait $pid 2>/dev/null || true' EXIT
           for i in {1..60}; do
             if curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status >/dev/null; then break; fi
             sleep 1
           done
           curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status
           BDS_RUNTIME_TOKEN=$BDS_RUNTIME_TOKEN node chrome-extension/tests/e2e.mjs
-      - name: Security smoke tests
-        working-directory: runtime
-        run: npm test -- tests/security-policy.test.ts
+          BDS_RUNTIME_TOKEN=$BDS_RUNTIME_TOKEN node runtime/scripts/security-smoke.mjs

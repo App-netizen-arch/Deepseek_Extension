@@ -80,39 +80,32 @@ async function executeLocalExecTag(tag: BdsTag, socket: WebSocket): Promise<void
     socket.send(JSON.stringify({ type: "runtime/error", payload: { message: "maximum concurrent background jobs reached" } } satisfies WsEvent));
     return;
   }
+  let job: Promise<unknown> | undefined;
   try {
     const request = tagToExecutionRequest(tag);
-    const job = executeLocalCode(request, store);
+    job = executeLocalCode(request, store);
     activeCodeJobs.add(job);
     const result = await job;
     socket.send(JSON.stringify({ type: "code/result", payload: result } satisfies WsEvent));
   } catch (error) {
     socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "code execution failed" } } satisfies WsEvent));
   } finally {
-    for (const job of activeCodeJobs) {
-      if (job && (job as Promise<unknown>)) {
-        // The resolved promise is removed below by identity in the caller.
-      }
-    }
+    if (job) activeCodeJobs.delete(job);
   }
 }
 
-function startWebTask(request: WebAgentRequest, send: (event: WsEvent) => void): string {
+function startWebTask(request: WebAgentRequest, send: (event: WsEvent) => void): void {
   if (activeCodeJobs.size + activeWebTaskCount() >= LIMITS.maxConcurrentJobs) {
     throw new Error("maximum concurrent background jobs reached");
   }
-  let taskId = "";
   void runWebAgent(request, store, (event) => {
-    if (event.payload.task_id) taskId = String(event.payload.task_id);
     send({ type: "web/event", payload: event });
-    if (event.type === "completed" || event.type === "cancelled") {
-      const id = String(event.payload.task_id ?? taskId);
-      if (id) webTaskResults.set(id, event.payload.result ?? event.payload);
+    if ((event.type === "completed" || event.type === "cancelled") && event.payload.task_id) {
+      webTaskResults.set(String(event.payload.task_id), event.payload.result ?? event.payload);
     }
   }).catch((error) => {
     send({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "web agent failed" } });
   });
-  return taskId || "pending";
 }
 
 function tagToWebRequest(tag: BdsTag): WebAgentRequest {
@@ -134,8 +127,7 @@ function tagToWebRequest(tag: BdsTag): WebAgentRequest {
 
 function triggerWebTag(tag: BdsTag, socket: WebSocket): void {
   try {
-    const request = tagToWebRequest(tag);
-    startWebTask(request, (event) => socket.send(JSON.stringify(event)));
+    startWebTask(tagToWebRequest(tag), (event) => socket.send(JSON.stringify(event)));
   } catch (error) {
     socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "web agent failed" } } satisfies WsEvent));
   }
@@ -221,11 +213,9 @@ export function createRuntimeServer() {
           return;
         }
         const body = JSON.parse(await readBody(req)) as WebAgentRequest;
-        const events: unknown[] = [];
-        const taskPromise = runWebAgent(body, store, (event) => events.push(event));
-        const task = await taskPromise;
-        webTaskResults.set(task.task_id, task);
-        json(res, 200, { ok: true, result: task });
+        const result = await runWebAgent(body, store, (event) => broadcast({ type: "web/event", payload: event }));
+        webTaskResults.set(result.task_id, result);
+        json(res, 200, { ok: true, result });
         return;
       }
 
@@ -331,9 +321,7 @@ export function createRuntimeServer() {
           store.audit("tags.detected", { count: tags.length, unsupported });
           socket.send(JSON.stringify({ type: "runtime/tags", payload: { tags, unsupported } } satisfies WsEvent));
           const localExec = tags.find((tag) => tag.name === "LOCAL_EXEC");
-          if (localExec) void executeLocalExecTag(localExec, socket).finally(() => {
-            // No-op; job lifetime is bounded by the executor.
-          });
+          if (localExec) void executeLocalExecTag(localExec, socket);
           const webAgent = tags.find((tag) => tag.name === "WEB_AGENT");
           if (webAgent) triggerWebTag(webAgent, socket);
           return;

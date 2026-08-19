@@ -4,13 +4,13 @@ export interface WsHello {
 }
 
 export interface WsMessage {
-  type: "status" | "tags" | "ping" | "code/execute";
+  type: "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel";
   requestId?: string;
   payload?: unknown;
 }
 
 export interface WsEvent {
-  type: "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result";
+  type: "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result" | "web/event";
   requestId?: string;
   payload?: unknown;
 }

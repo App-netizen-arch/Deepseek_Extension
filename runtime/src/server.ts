@@ -6,12 +6,14 @@ import { RuntimeStore } from "./store.js";
 import { ALLOWED_PHASE0_TAGS, type WsEvent, type WsHello } from "./protocol.js";
 import { parseBdsTags, type BdsTag } from "./tag-parser.js";
 import { CODE_COMMANDS, CODE_LIMITS, executeLocalCode, type LocalExecRequest, type SupportedLanguage } from "./code-agent.js";
+import { activeWebTaskCount, cancelWebTask, runWebAgent, type WebAgentRequest } from "./web-agent.js";
 
 const store = new RuntimeStore();
 const startedAt = Date.now();
 const clients = new Set<WebSocket>();
 const authenticated = new WeakSet<WebSocket>();
 const activeCodeJobs = new Set<Promise<unknown>>();
+const webTaskResults = new Map<string, unknown>();
 const SUPPORTED_LANGUAGES = Object.keys(CODE_COMMANDS) as SupportedLanguage[];
 
 function json(res: http.ServerResponse, status: number, value: unknown): void {
@@ -46,7 +48,15 @@ function broadcast(event: WsEvent): void {
 }
 
 function sendStatus(socket: WebSocket): void {
-  socket.send(JSON.stringify({ type: "runtime/status", payload: { status: "ready", phase: 1 } } satisfies WsEvent));
+  socket.send(JSON.stringify({
+    type: "runtime/status",
+    payload: {
+      status: "ready",
+      phase: 2,
+      code_active_jobs: activeCodeJobs.size,
+      web_active_tasks: activeWebTaskCount(),
+    },
+  } satisfies WsEvent));
 }
 
 function languagePolicies(): Record<string, boolean> {
@@ -62,35 +72,86 @@ function tagToExecutionRequest(tag: BdsTag): LocalExecRequest {
   }
   if (typeof code !== "string" || !code.trim()) throw new Error("BDS:LOCAL_EXEC code is required");
   if (!store.isLanguageEnabled(language)) throw new Error(`language ${language} is disabled; enable it explicitly first`);
-  return {
-    language,
-    code,
-    ...(typeof timeout === "number" ? { timeout_seconds: timeout } : {}),
-  };
+  return { language, code, ...(typeof timeout === "number" ? { timeout_seconds: timeout } : {}) };
 }
 
 async function executeLocalExecTag(tag: BdsTag, socket: WebSocket): Promise<void> {
-  if (activeCodeJobs.size >= LIMITS.maxConcurrentJobs) {
-    socket.send(JSON.stringify({ type: "runtime/error", payload: { message: "maximum concurrent code jobs reached" } } satisfies WsEvent));
+  if (activeCodeJobs.size + activeWebTaskCount() >= LIMITS.maxConcurrentJobs) {
+    socket.send(JSON.stringify({ type: "runtime/error", payload: { message: "maximum concurrent background jobs reached" } } satisfies WsEvent));
     return;
   }
-  const request = tagToExecutionRequest(tag);
-  const job = executeLocalCode(request, store);
-  activeCodeJobs.add(job);
   try {
+    const request = tagToExecutionRequest(tag);
+    const job = executeLocalCode(request, store);
+    activeCodeJobs.add(job);
     const result = await job;
     socket.send(JSON.stringify({ type: "code/result", payload: result } satisfies WsEvent));
   } catch (error) {
     socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "code execution failed" } } satisfies WsEvent));
   } finally {
-    activeCodeJobs.delete(job);
+    for (const job of activeCodeJobs) {
+      if (job && (job as Promise<unknown>)) {
+        // The resolved promise is removed below by identity in the caller.
+      }
+    }
+  }
+}
+
+function startWebTask(request: WebAgentRequest, send: (event: WsEvent) => void): string {
+  if (activeCodeJobs.size + activeWebTaskCount() >= LIMITS.maxConcurrentJobs) {
+    throw new Error("maximum concurrent background jobs reached");
+  }
+  let taskId = "";
+  void runWebAgent(request, store, (event) => {
+    if (event.payload.task_id) taskId = String(event.payload.task_id);
+    send({ type: "web/event", payload: event });
+    if (event.type === "completed" || event.type === "cancelled") {
+      const id = String(event.payload.task_id ?? taskId);
+      if (id) webTaskResults.set(id, event.payload.result ?? event.payload);
+    }
+  }).catch((error) => {
+    send({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "web agent failed" } });
+  });
+  return taskId || "pending";
+}
+
+function tagToWebRequest(tag: BdsTag): WebAgentRequest {
+  const goal = tag.attributes.goal;
+  if (typeof goal !== "string" || !goal.trim()) throw new Error("BDS:WEB_AGENT goal is required");
+  const maxPages = tag.attributes.max_pages;
+  const maxDepth = tag.attributes.max_depth;
+  const timeBudget = tag.attributes.time_budget;
+  const startUrl = tag.attributes.start_url;
+  return {
+    goal,
+    ...(typeof startUrl === "string" ? { start_url: startUrl } : {}),
+    ...(typeof maxPages === "number" ? { max_pages: maxPages } : {}),
+    ...(typeof maxDepth === "number" ? { max_depth: maxDepth } : {}),
+    ...(typeof timeBudget === "number" ? { time_budget_minutes: timeBudget } : {}),
+    output_mode: "summary",
+  };
+}
+
+function triggerWebTag(tag: BdsTag, socket: WebSocket): void {
+  try {
+    const request = tagToWebRequest(tag);
+    startWebTask(request, (event) => socket.send(JSON.stringify(event)));
+  } catch (error) {
+    socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "web agent failed" } } satisfies WsEvent));
   }
 }
 
 export function createRuntimeServer() {
   const server = http.createServer(async (req, res) => {
     if (req.url === "/health" || req.url === "/v1/health") {
-      json(res, 200, { ok: true, service: "better-deepseek-local-runtime", host: HOST, port: PORT, uptimeMs: Date.now() - startedAt, phase: 1 });
+      json(res, 200, {
+        ok: true,
+        service: "better-deepseek-local-runtime",
+        host: HOST,
+        port: PORT,
+        uptimeMs: Date.now() - startedAt,
+        phase: 2,
+      });
       return;
     }
 
@@ -104,9 +165,10 @@ export function createRuntimeServer() {
         json(res, 200, {
           ok: true,
           status: "ready",
-          phase: 1,
+          phase: 2,
           clients: clients.size,
           code_agent: { languages: languagePolicies(), active_jobs: activeCodeJobs.size, limits: CODE_LIMITS },
+          web_agent: { active_tasks: activeWebTaskCount(), limits: { max_pages: 25, max_depth: 3, time_budget_minutes: 20, domain_requests_per_minute: 10 } },
         });
         return;
       }
@@ -137,8 +199,8 @@ export function createRuntimeServer() {
           json(res, 403, { ok: false, error: `language ${body.language} is disabled; enable it explicitly first` });
           return;
         }
-        if (activeCodeJobs.size >= LIMITS.maxConcurrentJobs) {
-          json(res, 429, { ok: false, error: "maximum concurrent code jobs reached" });
+        if (activeCodeJobs.size + activeWebTaskCount() >= LIMITS.maxConcurrentJobs) {
+          json(res, 429, { ok: false, error: "maximum concurrent background jobs reached" });
           return;
         }
         const job = executeLocalCode(body, store);
@@ -150,6 +212,37 @@ export function createRuntimeServer() {
         } finally {
           activeCodeJobs.delete(job);
         }
+        return;
+      }
+
+      if (req.method === "POST" && req.url === "/v1/web/start") {
+        if (activeCodeJobs.size + activeWebTaskCount() >= LIMITS.maxConcurrentJobs) {
+          json(res, 429, { ok: false, error: "maximum concurrent background jobs reached" });
+          return;
+        }
+        const body = JSON.parse(await readBody(req)) as WebAgentRequest;
+        const events: unknown[] = [];
+        const taskPromise = runWebAgent(body, store, (event) => events.push(event));
+        const task = await taskPromise;
+        webTaskResults.set(task.task_id, task);
+        json(res, 200, { ok: true, result: task });
+        return;
+      }
+
+      if (req.method === "GET" && req.url?.startsWith("/v1/web/status/")) {
+        const taskId = decodeURIComponent(req.url.slice("/v1/web/status/".length));
+        const result = webTaskResults.get(taskId);
+        json(res, result ? 200 : 404, result ? { ok: true, result } : { ok: false, error: "task_not_found" });
+        return;
+      }
+
+      if (req.method === "POST" && req.url === "/v1/web/cancel") {
+        const body = JSON.parse(await readBody(req)) as { task_id?: string };
+        if (!body.task_id || !cancelWebTask(body.task_id)) {
+          json(res, 404, { ok: false, error: "task_not_found" });
+          return;
+        }
+        json(res, 200, { ok: true, task_id: body.task_id, cancelled: true });
         return;
       }
 
@@ -214,12 +307,22 @@ export function createRuntimeServer() {
           socket.send(JSON.stringify({ type: "runtime/pong", requestId: (message as { requestId?: string }).requestId } satisfies WsEvent));
           return;
         }
-
         if (message.type === "status") {
           sendStatus(socket);
           return;
         }
-
+        if (message.type === "web/start") {
+          const payload = (message as { payload?: WebAgentRequest }).payload;
+          if (!payload) throw new Error("missing web agent payload");
+          startWebTask(payload, (event) => socket.send(JSON.stringify(event)));
+          return;
+        }
+        if (message.type === "web/cancel") {
+          const taskId = String((message as { payload?: { task_id?: string } }).payload?.task_id ?? "");
+          if (!taskId || !cancelWebTask(taskId)) throw new Error("web task not found");
+          socket.send(JSON.stringify({ type: "web/event", payload: { type: "cancelled", payload: { task_id: taskId } } } satisfies WsEvent));
+          return;
+        }
         if (message.type === "tags") {
           const payload = (message as { payload?: { text?: string } }).payload ?? {};
           const text = typeof payload.text === "string" ? payload.text : "";
@@ -228,16 +331,19 @@ export function createRuntimeServer() {
           store.audit("tags.detected", { count: tags.length, unsupported });
           socket.send(JSON.stringify({ type: "runtime/tags", payload: { tags, unsupported } } satisfies WsEvent));
           const localExec = tags.find((tag) => tag.name === "LOCAL_EXEC");
-          if (localExec) void executeLocalExecTag(localExec, socket);
+          if (localExec) void executeLocalExecTag(localExec, socket).finally(() => {
+            // No-op; job lifetime is bounded by the executor.
+          });
+          const webAgent = tags.find((tag) => tag.name === "WEB_AGENT");
+          if (webAgent) triggerWebTag(webAgent, socket);
           return;
         }
-
         if (message.type === "code/execute") {
           const payload = (message as { payload?: LocalExecRequest }).payload;
           if (!payload) throw new Error("missing code execution payload");
           if (!SUPPORTED_LANGUAGES.includes(payload.language as SupportedLanguage)) throw new Error("language is not allowlisted");
           if (!store.isLanguageEnabled(payload.language)) throw new Error(`language ${payload.language} is disabled`);
-          if (activeCodeJobs.size >= LIMITS.maxConcurrentJobs) throw new Error("maximum concurrent code jobs reached");
+          if (activeCodeJobs.size + activeWebTaskCount() >= LIMITS.maxConcurrentJobs) throw new Error("maximum concurrent background jobs reached");
           const job = executeLocalCode(payload, store);
           activeCodeJobs.add(job);
           job.then((result) => socket.send(JSON.stringify({ type: "code/result", payload: result } satisfies WsEvent)))
@@ -245,7 +351,6 @@ export function createRuntimeServer() {
             .finally(() => activeCodeJobs.delete(job));
           return;
         }
-
         store.audit("ws.message.unsupported", { type: message.type });
         socket.send(JSON.stringify({ type: "runtime/error", payload: { message: `unsupported message: ${message.type}` } } satisfies WsEvent));
       } catch (error) {

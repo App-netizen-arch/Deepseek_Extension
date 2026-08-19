@@ -1,10 +1,10 @@
 import { chromium } from "playwright";
 import fs from "node:fs/promises";
 import path from "node:path";
-import crypto from "node:crypto";
 
 const extensionPath = path.resolve("chrome-extension");
-const token = crypto.randomBytes(32).toString("hex");
+const token = process.env.BDS_RUNTIME_TOKEN;
+if (!token || token.length < 32) throw new Error("BDS_RUNTIME_TOKEN is required for Chrome E2E");
 const userDataDir = path.resolve(".tmp-extension-e2e");
 await fs.rm(userDataDir,{recursive:true,force:true});
 const context = await chromium.launchPersistentContext(userDataDir,{headless:true,args:[`--disable-extensions-except=${extensionPath}`,`--load-extension=${extensionPath}`]});

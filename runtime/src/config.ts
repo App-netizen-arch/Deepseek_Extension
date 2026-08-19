@@ -1,7 +1,10 @@
+import path from "node:path";
+
 export const HOST = "127.0.0.1";
 export const PORT = Number(process.env.BDS_RUNTIME_PORT ?? 3037);
 export const TOKEN = String(process.env.BDS_RUNTIME_TOKEN ?? "").trim();
 export const DB_PATH = process.env.BDS_RUNTIME_DB ?? "./data/runtime.db";
+export const WORKSPACE = path.resolve(process.env.BDS_WORKSPACE ?? process.cwd());
 
 export const LIMITS = {
   wsMessageBytes: 256 * 1024,

@@ -23,14 +23,14 @@ function parseValue(value: string): unknown {
 
 export function parseBdsTags(text: string): BdsTag[] {
   const tags: BdsTag[] = [];
-  let match: RegExpExecArray | null;
-  while ((match = TAG_RE.exec(text)) !== null) {
-    const start = match.index;
+  const matches = [...text.matchAll(TAG_RE)];
+
+  for (let index = 0; index < matches.length; index += 1) {
+    const match = matches[index];
+    const start = match.index ?? 0;
     const lineEnd = text.indexOf("\n", start);
     const headerEnd = lineEnd === -1 ? text.length : lineEnd;
-    const next = TAG_RE.exec(text);
-    const end = next ? next.index : text.length;
-    if (next) TAG_RE.lastIndex = next.index;
+    const end = index + 1 < matches.length ? (matches[index + 1].index ?? text.length) : text.length;
 
     const raw = text.slice(start, end).trim();
     const body = text.slice(headerEnd === text.length ? text.length : headerEnd + 1, end);
@@ -46,6 +46,6 @@ export function parseBdsTags(text: string): BdsTag[] {
     }
     tags.push({ name: match[1], attributes, raw, start, end });
   }
-  TAG_RE.lastIndex = 0;
+
   return tags;
 }

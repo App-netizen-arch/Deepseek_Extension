@@ -38,7 +38,7 @@ function readBody(req: http.IncomingMessage): Promise<string> {
 function broadcast(event: WsEvent): void {
   const encoded = JSON.stringify(event);
   for (const client of clients) {
-    if (authenticated.has(client) && client.readyState === client.OPEN) client.send(encoded);
+    if (authenticated.has(client) && client.readyState === 1) client.send(encoded);
   }
 }
 

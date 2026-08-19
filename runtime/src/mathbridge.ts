@@ -47,9 +47,9 @@ function normalizeLatex(value: string): string {
 
 function mathmlToLatex(value: string): string {
   const input = value.trim();
-  const annotation = input.match(/<annotation[^>]*encoding=["']application\\/x-tex["'][^>]*>([\\s\\S]*?)<\\/annotation>/i);
+  const annotation = input.match(/<annotation[^>]*encoding=["']application\/x-tex["'][^>]*>([\s\S]*?)<\/annotation>/i);
   if (annotation) return normalizeLatex(annotation[1]);
-  const semantics = input.match(/<semantics[^>]*>[\\s\\S]*?<annotation[^>]*>([\\s\\S]*?)<\\/annotation>[\\s\\S]*?<\\/semantics>/i);
+  const semantics = input.match(/<semantics[^>]*>[\s\S]*?<annotation[^>]*>([\s\S]*?)<\/annotation>[\s\S]*?<\/semantics>/i);
   if (semantics) return normalizeLatex(semantics[1]);
   throw new Error("MathML has no embedded application/x-tex annotation");
 }

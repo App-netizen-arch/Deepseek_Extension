@@ -5,11 +5,14 @@ import { HOST, LIMITS, PORT, TOKEN } from "./config.js";
 import { RuntimeStore } from "./store.js";
 import { ALLOWED_PHASE0_TAGS, type WsEvent, type WsHello } from "./protocol.js";
 import { parseBdsTags } from "./tag-parser.js";
+import { CODE_COMMANDS, CODE_LIMITS, executeLocalCode, type LocalExecRequest, type SupportedLanguage } from "./code-agent.js";
 
 const store = new RuntimeStore();
 const startedAt = Date.now();
 const clients = new Set<WebSocket>();
 const authenticated = new WeakSet<WebSocket>();
+const activeCodeJobs = new Set<Promise<unknown>>();
+const SUPPORTED_LANGUAGES = Object.keys(CODE_COMMANDS) as SupportedLanguage[];
 
 function json(res: http.ServerResponse, status: number, value: unknown): void {
   const body = JSON.stringify(value);
@@ -43,13 +46,17 @@ function broadcast(event: WsEvent): void {
 }
 
 function sendStatus(socket: WebSocket): void {
-  socket.send(JSON.stringify({ type: "runtime/status", payload: { status: "ready", phase: 0 } } satisfies WsEvent));
+  socket.send(JSON.stringify({ type: "runtime/status", payload: { status: "ready", phase: 1 } } satisfies WsEvent));
+}
+
+function languagePolicies(): Record<string, boolean> {
+  return store.listLanguagePolicies(SUPPORTED_LANGUAGES);
 }
 
 export function createRuntimeServer() {
   const server = http.createServer(async (req, res) => {
     if (req.url === "/health" || req.url === "/v1/health") {
-      json(res, 200, { ok: true, service: "better-deepseek-local-runtime", host: HOST, port: PORT, uptimeMs: Date.now() - startedAt });
+      json(res, 200, { ok: true, service: "better-deepseek-local-runtime", host: HOST, port: PORT, uptimeMs: Date.now() - startedAt, phase: 1 });
       return;
     }
 
@@ -60,7 +67,55 @@ export function createRuntimeServer() {
 
     try {
       if (req.method === "GET" && req.url === "/v1/status") {
-        json(res, 200, { ok: true, status: "ready", phase: 0, clients: clients.size });
+        json(res, 200, {
+          ok: true,
+          status: "ready",
+          phase: 1,
+          clients: clients.size,
+          code_agent: { languages: languagePolicies(), active_jobs: activeCodeJobs.size, limits: CODE_LIMITS },
+        });
+        return;
+      }
+
+      if (req.method === "GET" && req.url === "/v1/code/languages") {
+        json(res, 200, { ok: true, languages: SUPPORTED_LANGUAGES.map((language) => ({ language, enabled: store.isLanguageEnabled(language) })) });
+        return;
+      }
+
+      if (req.method === "POST" && req.url === "/v1/code/languages/enable") {
+        const body = JSON.parse(await readBody(req)) as { language?: string; enabled?: boolean };
+        if (!body.language || !SUPPORTED_LANGUAGES.includes(body.language as SupportedLanguage) || typeof body.enabled !== "boolean") {
+          json(res, 400, { ok: false, error: "language and boolean enabled are required" });
+          return;
+        }
+        store.setLanguageEnabled(body.language, body.enabled);
+        json(res, 200, { ok: true, language: body.language, enabled: body.enabled });
+        return;
+      }
+
+      if (req.method === "POST" && req.url === "/v1/code/execute") {
+        const body = JSON.parse(await readBody(req)) as LocalExecRequest;
+        if (!body.language || !SUPPORTED_LANGUAGES.includes(body.language as SupportedLanguage)) {
+          json(res, 400, { ok: false, error: "language is not allowlisted" });
+          return;
+        }
+        if (!store.isLanguageEnabled(body.language)) {
+          json(res, 403, { ok: false, error: `language ${body.language} is disabled; enable it explicitly first` });
+          return;
+        }
+        if (activeCodeJobs.size >= LIMITS.maxConcurrentJobs) {
+          json(res, 429, { ok: false, error: "maximum concurrent code jobs reached" });
+          return;
+        }
+        const job = executeLocalCode(body, store);
+        activeCodeJobs.add(job);
+        try {
+          const result = await job;
+          broadcast({ type: "code/result", payload: result });
+          json(res, 200, { ok: true, result });
+        } finally {
+          activeCodeJobs.delete(job);
+        }
         return;
       }
 
@@ -141,10 +196,25 @@ export function createRuntimeServer() {
           return;
         }
 
+        if (message.type === "code/execute") {
+          const payload = (message as { payload?: LocalExecRequest }).payload;
+          if (!payload) throw new Error("missing code execution payload");
+          if (!SUPPORTED_LANGUAGES.includes(payload.language as SupportedLanguage)) throw new Error("language is not allowlisted");
+          if (!store.isLanguageEnabled(payload.language)) throw new Error(`language ${payload.language} is disabled`);
+          if (activeCodeJobs.size >= LIMITS.maxConcurrentJobs) throw new Error("maximum concurrent code jobs reached");
+          const job = executeLocalCode(payload, store);
+          activeCodeJobs.add(job);
+          job.then((result) => socket.send(JSON.stringify({ type: "code/result", payload: result } satisfies WsEvent)))
+            .catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "code execution failed" } } satisfies WsEvent)))
+            .finally(() => activeCodeJobs.delete(job));
+          return;
+        }
+
         store.audit("ws.message.unsupported", { type: message.type });
         socket.send(JSON.stringify({ type: "runtime/error", payload: { message: `unsupported message: ${message.type}` } } satisfies WsEvent));
-      } catch {
-        socket.close(1007, "invalid message");
+      } catch (error) {
+        const messageText = error instanceof Error ? error.message : "invalid message";
+        socket.send(JSON.stringify({ type: "runtime/error", payload: { message: messageText } } satisfies WsEvent));
       }
     });
 

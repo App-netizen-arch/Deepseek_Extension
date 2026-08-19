@@ -1,9 +1,9 @@
+import { createHash, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
-import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { RuntimeStore } from "./store.js";
-import type { MathIRDocument } from "./mathir.js";
+import type { MathIRDocument, MathRelation } from "./mathir.js";
 
 const PIPELINE = path.resolve(process.cwd(), "scripts/math-pdf-pipeline.py");
 const MAX_PDF_BYTES = 100 * 1024 * 1024;
@@ -15,66 +15,37 @@ function allowedDocumentPath(input: string): string {
   const relative = path.relative(root, resolved);
   if (relative.startsWith("..") || path.isAbsolute(relative)) throw new Error("PDF is outside the configured document root");
   const lower = resolved.toLowerCase();
-  if (lower.includes(`${path.sep}.ssh${path.sep}`) || lower.endsWith(`${path.sep}.env`) || lower.includes(`${path.sep}.env.`)) {
-    throw new Error("sensitive files are not accepted by MathBridge");
-  }
+  if (lower.includes(`${path.sep}.ssh${path.sep}`) || lower.endsWith(`${path.sep}.env`) || lower.includes(`${path.sep}.env.`)) throw new Error("sensitive files are not accepted by MathBridge");
   return resolved;
 }
-
+function deriveRelations(document: MathIRDocument): MathRelation[] {
+  const relations = [...document.relations];
+  const known = new Set(relations.map(r => `${r.type}:${r.from}:${r.to}`));
+  const add = (type: MathRelation["type"], from: string, to: string) => { const key=`${type}:${from}:${to}`; if(from!==to&&!known.has(key)){known.add(key);relations.push({type,from,to});} };
+  for (const theorem of document.theorems) { for (const dep of theorem.dependencies) add("depends_on", theorem.id, dep); for (const ref of theorem.references) add("references", theorem.id, ref); }
+  for (const section of document.sections) { for (const theorem of document.theorems.filter(t=>t.page===section.page_start)) add("contains", section.id, theorem.id); for (const equation of document.equations.filter(e=>e.page===section.page_start)) add("contains", section.id, equation.id); }
+  return relations;
+}
+function sha256File(filePath:string):Promise<string>{return new Promise((resolve,reject)=>{const hash=createHash("sha256");import("node:fs").then(({createReadStream})=>{const stream=createReadStream(filePath);stream.on("data",chunk=>hash.update(chunk));stream.on("end",()=>resolve(hash.digest("hex")));stream.on("error",reject);}).catch(reject);});}
 function runPipeline(filePath: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn("python3", [PIPELINE, filePath], { shell: false, stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
-    let stdout = "";
-    let stderr = "";
-    let finished = false;
-    const timer = setTimeout(() => {
-      if (finished) return;
-      finished = true;
-      try { child.kill("SIGKILL"); } catch { /* already exited */ }
-      reject(new Error("Math PDF pipeline timed out"));
-    }, PIPELINE_TIMEOUT_MS);
+    let stdout = ""; let stderr = ""; let finished = false;
+    const timer = setTimeout(() => { if (finished) return; finished = true; try { child.kill("SIGKILL"); } catch {} reject(new Error("Math PDF pipeline timed out")); }, PIPELINE_TIMEOUT_MS);
     child.stdout.on("data", (chunk: Buffer) => { stdout += chunk.toString("utf8"); if (stdout.length > 12_000_000) stdout = stdout.slice(0, 12_000_000); });
     child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString("utf8"); if (stderr.length > 512_000) stderr = stderr.slice(0, 512_000); });
     child.once("error", (error) => { if (!finished) { finished = true; clearTimeout(timer); reject(error); } });
-    child.once("close", (code) => {
-      if (finished) return;
-      finished = true;
-      clearTimeout(timer);
-      if (code !== 0) reject(new Error(stderr.trim() || `Math PDF pipeline exited with ${code}`));
-      else resolve(stdout.trim());
-    });
+    child.once("close", (code) => { if (finished) return; finished = true; clearTimeout(timer); if (code !== 0) reject(new Error(stderr.trim() || `Math PDF pipeline exited with ${code}`)); else resolve(stdout.trim()); });
   });
 }
-
-export interface MathDocumentIngestResult {
-  document: MathIRDocument;
-  ingestion: { path: string; bytes: number; duration_ms: number };
-}
-
+export interface MathDocumentIngestResult { document: MathIRDocument; ingestion: { path: string; bytes: number; duration_ms: number; sha256: string; extractor: string; }; }
 export async function ingestMathPdf(file: string, store: RuntimeStore): Promise<MathDocumentIngestResult> {
-  const pdfPath = allowedDocumentPath(file);
-  const stat = await fs.stat(pdfPath);
-  if (!stat.isFile() || path.extname(pdfPath).toLowerCase() !== ".pdf") throw new Error("file must be a PDF");
-  if (stat.size > MAX_PDF_BYTES) throw new Error("PDF exceeds the 100 MiB MathBridge limit");
-  const started = Date.now();
-  const raw = JSON.parse(await runPipeline(pdfPath)) as { ok?: boolean; error?: string; title?: string; pages?: number; sections?: unknown[]; equations?: unknown[]; theorems?: unknown[]; figures?: unknown[]; tables?: unknown[]; references?: unknown[]; relations?: unknown[]; metadata?: Record<string, unknown> };
-  if (!raw.ok) throw new Error(raw.error || "Math PDF ingestion failed");
-  const document: MathIRDocument = {
-    id: `doc_${randomUUID().replaceAll("-", "").slice(0, 16)}`,
-    title: String(raw.title || path.basename(pdfPath, ".pdf")),
-    source_path: pdfPath,
-    created_at: new Date().toISOString(),
-    pages: Number(raw.pages || 0),
-    sections: Array.isArray(raw.sections) ? raw.sections as MathIRDocument["sections"] : [],
-    equations: Array.isArray(raw.equations) ? raw.equations as MathIRDocument["equations"] : [],
-    theorems: Array.isArray(raw.theorems) ? raw.theorems as MathIRDocument["theorems"] : [],
-    figures: Array.isArray(raw.figures) ? raw.figures as MathIRDocument["figures"] : [],
-    tables: Array.isArray(raw.tables) ? raw.tables as MathIRDocument["tables"] : [],
-    references: Array.isArray(raw.references) ? raw.references as MathIRDocument["references"] : [],
-    relations: Array.isArray(raw.relations) ? raw.relations as MathIRDocument["relations"] : [],
-    metadata: raw.metadata ?? {},
-  };
-  store.upsertMathDocument(document.id, document.title, document.source_path, document);
-  store.audit("math.document.ingested", { document_id: document.id, pages: document.pages, equations: document.equations.length, theorems: document.theorems.length, figures: document.figures.length, duration_ms: Date.now() - started });
-  return { document, ingestion: { path: pdfPath, bytes: stat.size, duration_ms: Date.now() - started } };
+  const pdfPath = allowedDocumentPath(file); const stat = await fs.stat(pdfPath); if (!stat.isFile() || path.extname(pdfPath).toLowerCase() !== ".pdf") throw new Error("file must be a PDF"); if (stat.size > MAX_PDF_BYTES) throw new Error("PDF exceeds the 100 MiB MathBridge limit");
+  const started = Date.now(); const sha256 = await sha256File(pdfPath); const raw = JSON.parse(await runPipeline(pdfPath)) as { ok?: boolean; error?: string; title?: string; pages?: number; sections?: unknown[]; equations?: unknown[]; theorems?: unknown[]; figures?: unknown[]; tables?: unknown[]; references?: unknown[]; relations?: unknown[]; metadata?: Record<string, unknown> }; if (!raw.ok) throw new Error(raw.error || "Math PDF ingestion failed");
+  const extractor = typeof raw.metadata?.extractor === "string" ? raw.metadata.extractor : "local-math-pdf-pipeline";
+  const metadata = { ...(raw.metadata ?? {}), provenance: { source_sha256: sha256, source_filename: path.basename(pdfPath), extracted_at: new Date().toISOString(), extractor, extractor_version: "runtime-0.3", local_only: true } };
+  const document: MathIRDocument = { id: `doc_${randomUUID().replaceAll("-", "").slice(0, 16)}`, title: String(raw.title || path.basename(pdfPath, ".pdf")), source_path: pdfPath, created_at: new Date().toISOString(), pages: Number(raw.pages || 0), sections: Array.isArray(raw.sections) ? raw.sections as MathIRDocument["sections"] : [], equations: Array.isArray(raw.equations) ? raw.equations as MathIRDocument["equations"] : [], theorems: Array.isArray(raw.theorems) ? raw.theorems as MathIRDocument["theorems"] : [], figures: Array.isArray(raw.figures) ? raw.figures as MathIRDocument["figures"] : [], tables: Array.isArray(raw.tables) ? raw.tables as MathIRDocument["tables"] : [], references: Array.isArray(raw.references) ? raw.references as MathIRDocument["references"] : [], relations: [], metadata };
+  document.relations = deriveRelations(document);
+  store.upsertMathDocument(document.id, document.title, document.source_path, document); store.audit("math.document.ingested", { document_id: document.id, pages: document.pages, equations: document.equations.length, theorems: document.theorems.length, figures: document.figures.length, relations: document.relations.length, source_sha256: sha256, extractor, duration_ms: Date.now() - started });
+  return { document, ingestion: { path: pdfPath, bytes: stat.size, duration_ms: Date.now() - started, sha256, extractor } };
 }

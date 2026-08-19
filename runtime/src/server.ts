@@ -4,7 +4,7 @@ import { authenticateBearer } from "./auth.js";
 import { HOST, LIMITS, PORT, TOKEN } from "./config.js";
 import { RuntimeStore } from "./store.js";
 import { ALLOWED_PHASE0_TAGS, type WsEvent, type WsHello } from "./protocol.js";
-import { parseBdsTags } from "./tag-parser.js";
+import { parseBdsTags, type BdsTag } from "./tag-parser.js";
 import { CODE_COMMANDS, CODE_LIMITS, executeLocalCode, type LocalExecRequest, type SupportedLanguage } from "./code-agent.js";
 
 const store = new RuntimeStore();
@@ -51,6 +51,40 @@ function sendStatus(socket: WebSocket): void {
 
 function languagePolicies(): Record<string, boolean> {
   return store.listLanguagePolicies(SUPPORTED_LANGUAGES);
+}
+
+function tagToExecutionRequest(tag: BdsTag): LocalExecRequest {
+  const language = tag.attributes.language;
+  const code = tag.attributes.code;
+  const timeout = tag.attributes.timeout;
+  if (typeof language !== "string" || !SUPPORTED_LANGUAGES.includes(language as SupportedLanguage)) {
+    throw new Error("BDS:LOCAL_EXEC language is not allowlisted");
+  }
+  if (typeof code !== "string" || !code.trim()) throw new Error("BDS:LOCAL_EXEC code is required");
+  if (!store.isLanguageEnabled(language)) throw new Error(`language ${language} is disabled; enable it explicitly first`);
+  return {
+    language,
+    code,
+    ...(typeof timeout === "number" ? { timeout_seconds: timeout } : {}),
+  };
+}
+
+async function executeLocalExecTag(tag: BdsTag, socket: WebSocket): Promise<void> {
+  if (activeCodeJobs.size >= LIMITS.maxConcurrentJobs) {
+    socket.send(JSON.stringify({ type: "runtime/error", payload: { message: "maximum concurrent code jobs reached" } } satisfies WsEvent));
+    return;
+  }
+  const request = tagToExecutionRequest(tag);
+  const job = executeLocalCode(request, store);
+  activeCodeJobs.add(job);
+  try {
+    const result = await job;
+    socket.send(JSON.stringify({ type: "code/result", payload: result } satisfies WsEvent));
+  } catch (error) {
+    socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "code execution failed" } } satisfies WsEvent));
+  } finally {
+    activeCodeJobs.delete(job);
+  }
 }
 
 export function createRuntimeServer() {
@@ -193,6 +227,8 @@ export function createRuntimeServer() {
           const unsupported = tags.filter((tag) => !ALLOWED_PHASE0_TAGS.has(tag.name)).map((tag) => tag.name);
           store.audit("tags.detected", { count: tags.length, unsupported });
           socket.send(JSON.stringify({ type: "runtime/tags", payload: { tags, unsupported } } satisfies WsEvent));
+          const localExec = tags.find((tag) => tag.name === "LOCAL_EXEC");
+          if (localExec) void executeLocalExecTag(localExec, socket);
           return;
         }
 

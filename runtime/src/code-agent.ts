@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { LIMITS } from "./config.js";
+import { LIMITS, WORKSPACE } from "./config.js";
 import type { RuntimeStore } from "./store.js";
 
 export type SupportedLanguage = "zig" | "lean4" | "python";
@@ -112,7 +112,7 @@ export async function executeLocalCode(
   try {
     const result = await new Promise<LocalExecResult>((resolve) => {
       const child = spawn(command[0], command.slice(1), {
-        cwd: jobDir,
+        cwd: request.language === "lean4" ? WORKSPACE : jobDir,
         shell: false,
         detached: process.platform !== "win32",
         stdio: ["ignore", "pipe", "pipe"],
@@ -127,10 +127,11 @@ export async function executeLocalCode(
       });
 
       let settled = false;
+      let timer: NodeJS.Timeout | undefined;
       const finish = (exitCode: number | null) => {
         if (settled) return;
         settled = true;
-        clearTimeout(timer);
+        if (timer) clearTimeout(timer);
         const stdout = decode(stdoutParts);
         const stderr = decode(stderrParts);
         resolve({
@@ -153,7 +154,7 @@ export async function executeLocalCode(
       });
       child.once("close", (code) => finish(code));
 
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         timedOut = true;
         killProcessTree(child);
       }, timeoutMs);

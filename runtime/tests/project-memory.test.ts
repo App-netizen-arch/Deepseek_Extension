@@ -33,9 +33,12 @@ describe("project memory",()=>{
   it("encrypts stored values and owns its audit schema",()=>{
     const p=store.createProject("p",dir);
     store.write(p.id,{module:"math",type:"mathir",key:"eq",value:"x^2+y^2=z^2",source:"paper.pdf:2"});
-    const raw=new Database(dbPath).prepare("SELECT value_ciphertext FROM memories").get() as {value_ciphertext:string};
-    expect(raw.value_ciphertext).not.toContain("x^2+y^2=z^2");
-    expect(new Database(dbPath).prepare("SELECT COUNT(*) AS count FROM audit_events").get()).toEqual({count:expect.any(Number)});
+    const db=new Database(dbPath);
+    try{
+      const raw=db.prepare("SELECT value_ciphertext FROM memories").get() as {value_ciphertext:string};
+      expect(raw.value_ciphertext).not.toContain("x^2+y^2=z^2");
+      expect(db.prepare("SELECT COUNT(*) AS count FROM audit_events").get()).toEqual({count:expect.any(Number)});
+    }finally{db.close();}
     expect(memoryContext(store.list(p.id))).toContain("[MEMORY]");
   });
 
@@ -46,7 +49,7 @@ describe("project memory",()=>{
       const p=second.createProject("second",dir);
       second.write(p.id,{module:"shared",type:"fact",key:"isolated",value:"yes"});
       expect(second.list(p.id)).toHaveLength(1);
-      expect(store.listProjects()).toHaveLength(1===store.listProjects().length?1:0);
+      expect(store.listProjects()).toHaveLength(0);
     }finally{second.close();}
   });
 });

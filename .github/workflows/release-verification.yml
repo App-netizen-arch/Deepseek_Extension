@@ -1,0 +1,51 @@
+name: Release Verification
+
+on:
+  push:
+    branches: [release-candidate]
+  pull_request:
+    branches: [main]
+
+jobs:
+  release-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: runtime/package.json
+      - name: Install runtime dependencies
+        working-directory: runtime
+        run: npm install
+      - name: Build runtime
+        working-directory: runtime
+        run: npm run build
+      - name: Runtime tests
+        working-directory: runtime
+        run: npm test
+      - name: Extension package smoke test
+        run: node chrome-extension/tests/manifest-smoke.mjs
+      - name: Install Chromium
+        working-directory: runtime
+        run: npx playwright install --with-deps chromium
+      - name: Start runtime and run Chrome E2E
+        env:
+          BDS_RUNTIME_TOKEN: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          BDS_RUNTIME_DB: ${{ runner.temp }}/bds-e2e.db
+          BDS_WORKSPACE: ${{ github.workspace }}
+          BDS_LOG_DIR: ${{ runner.temp }}/bds-logs
+        run: |
+          node runtime/dist/index.js > /tmp/bds-runtime.log 2>&1 &
+          pid=$!
+          trap 'kill $pid 2>/dev/null || true' EXIT
+          for i in {1..60}; do
+            if curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status
+          BDS_RUNTIME_TOKEN=$BDS_RUNTIME_TOKEN node chrome-extension/tests/e2e.mjs
+      - name: Security smoke tests
+        working-directory: runtime
+        run: npm test -- tests/security-policy.test.ts

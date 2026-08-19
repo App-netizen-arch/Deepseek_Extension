@@ -78,13 +78,23 @@ export class BdsRuntimeClient {
     await this.connect();
     if (!this.#socket || this.#socket.readyState !== WebSocket.OPEN) throw new Error("Runtime is offline");
     return await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
+      let settled = false;
+      const finish = (fn, value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        off();
         this.#pending.delete(requestId);
-        reject(new Error("Runtime request timed out"));
-      }, timeoutMs);
+        fn(value);
+      };
+      const off = this.onEvent((event) => {
+        if (event?.requestId === requestId || (message.type === "math/analyze" && event?.type === "math/result")) finish(resolve, event);
+        else if (message.type === "math/analyze" && event?.type === "runtime/error") finish(reject, new Error(event?.payload?.message || "MathBridge error"));
+      });
+      const timer = setTimeout(() => finish(reject, new Error("Runtime request timed out")), timeoutMs);
       this.#pending.set(requestId, {
-        resolve: (value) => { clearTimeout(timer); resolve(value); },
-        reject: (error) => { clearTimeout(timer); reject(error); },
+        resolve: (value) => finish(resolve, value),
+        reject: (error) => finish(reject, error),
       });
       this.#socket.send(JSON.stringify({ ...message, requestId }));
     });

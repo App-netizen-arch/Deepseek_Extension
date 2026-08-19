@@ -20,6 +20,31 @@ export class RuntimeStore {
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS web_tasks (
+        id TEXT PRIMARY KEY,
+        status TEXT NOT NULL,
+        request_json TEXT NOT NULL,
+        checkpoint_json TEXT,
+        result_json TEXT,
+        updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS web_sessions (
+        name TEXT PRIMARY KEY,
+        state_ciphertext TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS approvals (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        target TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        status TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `);
   }
 
@@ -46,6 +71,64 @@ export class RuntimeStore {
 
   listLanguagePolicies(languages: readonly string[]): Record<string, boolean> {
     return Object.fromEntries(languages.map((language) => [language, this.isLanguageEnabled(language)]));
+  }
+
+  upsertWebTask(id: string, status: string, request: unknown, checkpoint?: unknown, result?: unknown): void {
+    const now = new Date().toISOString();
+    this.db.prepare(`INSERT INTO web_tasks(id,status,request_json,checkpoint_json,result_json,updated_at)
+      VALUES(?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status, request_json=excluded.request_json,
+      checkpoint_json=excluded.checkpoint_json, result_json=excluded.result_json, updated_at=excluded.updated_at`)
+      .run(id, status, JSON.stringify(request), checkpoint == null ? null : JSON.stringify(checkpoint), result == null ? null : JSON.stringify(result), now);
+  }
+
+  getWebTask(id: string): { id: string; status: string; request: any; checkpoint: any; result: any } | undefined {
+    const row = this.db.prepare("SELECT * FROM web_tasks WHERE id=?").get(id) as any;
+    if (!row) return undefined;
+    return {
+      id: row.id,
+      status: row.status,
+      request: JSON.parse(row.request_json),
+      checkpoint: row.checkpoint_json ? JSON.parse(row.checkpoint_json) : null,
+      result: row.result_json ? JSON.parse(row.result_json) : null,
+    };
+  }
+
+  listWebTasks(limit = 100): Array<{ id: string; status: string; updated_at: string }> {
+    return this.db.prepare("SELECT id,status,updated_at FROM web_tasks ORDER BY updated_at DESC LIMIT ?").all(limit) as any;
+  }
+
+  upsertWebSession(name: string, stateCiphertext: string, expiresAt: string): void {
+    const now = new Date().toISOString();
+    this.db.prepare(`INSERT INTO web_sessions(name,state_ciphertext,expires_at,created_at,updated_at) VALUES(?,?,?,?,?)
+      ON CONFLICT(name) DO UPDATE SET state_ciphertext=excluded.state_ciphertext,expires_at=excluded.expires_at,updated_at=excluded.updated_at`)
+      .run(name, stateCiphertext, expiresAt, now, now);
+  }
+
+  getWebSession(name: string): { name: string; state_ciphertext: string; expires_at: string } | undefined {
+    return this.db.prepare("SELECT name,state_ciphertext,expires_at FROM web_sessions WHERE name=?").get(name) as any;
+  }
+
+  listWebSessions(): Array<{ name: string; expires_at: string }> {
+    return this.db.prepare("SELECT name,expires_at FROM web_sessions ORDER BY name").all() as any;
+  }
+
+  deleteWebSession(name: string): boolean {
+    return this.db.prepare("DELETE FROM web_sessions WHERE name=?").run(name).changes > 0;
+  }
+
+  createApproval(id: string, taskId: string, action: string, target: string, expiresAt: string): void {
+    const now = new Date().toISOString();
+    this.db.prepare("INSERT INTO approvals(id,task_id,action,target,expires_at,status,created_at,updated_at) VALUES(?,?,?,?,?, 'pending',?,?)")
+      .run(id, taskId, action, target, expiresAt, now, now);
+  }
+
+  getApproval(id: string): any {
+    return this.db.prepare("SELECT * FROM approvals WHERE id=?").get(id);
+  }
+
+  decideApproval(id: string, status: "approved" | "denied"): boolean {
+    return this.db.prepare("UPDATE approvals SET status=?,updated_at=? WHERE id=? AND status='pending'")
+      .run(status, new Date().toISOString(), id).changes > 0;
   }
 
   close(): void { this.db.close(); }

@@ -1,6 +1,6 @@
-# Better DeepSeek Local Runtime — Phase 1
+# Better DeepSeek Local Runtime — Phase 2
 
-This directory contains the local-only runtime required by the Better DeepSeek agent architecture, including the Phase 1 native Code Agent bridge.
+This directory contains the local-first runtime required by the Better DeepSeek agent architecture, including the native Code Agent and read-only Web Agent MVP.
 
 ## Security boundary
 
@@ -9,17 +9,17 @@ This directory contains the local-only runtime required by the Better DeepSeek a
 - WebSocket clients authenticate with a token in their first message; unauthenticated sockets are closed after 5 seconds.
 - The runtime never binds to `0.0.0.0` and does not expose a public API.
 - SQLite state and audit data stay under `runtime/data/` and are ignored by Git.
-- No cloud upload is implemented.
-- Code execution uses a server-side language allowlist and argument arrays only; shell command strings are never accepted.
-- Languages are disabled by default and must be explicitly enabled through the authenticated local API.
-- Code is written to a 0600 temporary file and execution is bounded by a 15-second one-shot timeout, 1 MiB captured output, 256 KiB source input, and three concurrent jobs.
-- Timeout cleanup kills the process tree on supported platforms.
+- No telemetry or cloud upload is implemented by the runtime by default.
+- Code execution uses a server-side language allowlist and argument arrays only.
+- The Web Agent is read-only: it does not log in, submit forms, post, solve CAPTCHAs, bypass paywalls, or modify remote content.
+- Web pages are untrusted input and are never treated as tool commands.
 
 ## Setup
 
 ```bash
 cd runtime
 npm install
+npx playwright install chromium
 TOKEN=$(node scripts/setup-token.mjs)
 export BDS_RUNTIME_TOKEN="$TOKEN"
 export BDS_WORKSPACE="/absolute/path/to/your/project"
@@ -38,65 +38,48 @@ BDS_RUNTIME_DB=./data/runtime.db
 BDS_WORKSPACE=/absolute/path/to/project
 ```
 
-For Lean 4, `BDS_WORKSPACE` should point at the local Lake project so `lake env lean` can resolve its environment and imports. Zig and Python one-shot programs run from isolated temporary directories.
-
-## Endpoints
-
-```text
-GET  /health
-GET  /v1/health
-GET  /v1/status                       authenticated
-GET  /v1/code/languages               authenticated
-POST /v1/code/languages/enable        authenticated
-POST /v1/code/execute                 authenticated
-POST /v1/tags/parse                   authenticated
-POST /v1/audit                        authenticated
-WS   /ws                              authenticated after first message
-```
-
-Enable a language explicitly before execution:
-
-```bash
-curl -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"language":"zig","enabled":true}' \
-  http://127.0.0.1:3037/v1/code/languages/enable
-```
-
-Run a local program directly:
-
-```bash
-curl -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"language":"zig","code":"const std = @import(\"std\"); pub fn main() !void { std.debug.print(\"hello\\n\", .{}); }","timeout_seconds":15}' \
-  http://127.0.0.1:3037/v1/code/execute
-```
-
-## BDS:LOCAL_EXEC
+## Web Agent MVP
 
 DeepSeek can emit:
 
 ```text
-BDS:LOCAL_EXEC
-language = "zig"
-code = "const std = @import(\"std\"); ..."
-timeout = 15
+BDS:WEB_AGENT
+goal = "Compare recent protein folding models after AlphaFold 3"
+max_pages = 10
+max_depth = 2
+time_budget = 15
+output_mode = "summary"
 ```
 
-The extension's tag bridge forwards the full assistant message over the authenticated WebSocket. The runtime parses the tag, validates the language against the immutable server-side command map, executes the generated file locally, and returns a structured `code/result` event containing `stdout`, `stderr`, `exit_code`, `duration_ms`, `truncated`, and `timed_out`.
+The runtime launches a headless Chromium instance through Playwright, uses a public search page when no `start_url` is provided, renders JavaScript, extracts readable page text, records citations, follows relevant public links, and stops at the configured page/depth/time budget. Each citation contains the source URL, title, access time, and an excerpt taken from the rendered page.
 
-Supported Phase 1 languages and command maps:
+Web Agent limits are capped at 25 pages, depth 3, 20 minutes per task, and 10 requests per domain per minute. `robots.txt`, `noindex`, and `nofollow` are honored where detectable. Failed or blocked pages are recorded and skipped rather than failing the entire task.
 
-```json
-{
-  "zig": ["zig", "run", "<temporary-file>"],
-  "lean4": ["lake", "env", "lean", "<temporary-file>"],
-  "python": ["python3", "<temporary-file>"]
-}
+The MVP synthesis is local and deterministic: it ranks collected evidence against the research goal and assembles a cited evidence summary. No remote LLM call is required to run the browser agent.
+
+## Web Agent endpoints
+
+```text
+GET  /v1/status                       authenticated
+POST /v1/web/start                    authenticated
+GET  /v1/web/status/:task_id          authenticated
+POST /v1/web/cancel                   authenticated
+WS   /ws                              authenticated after first message
 ```
 
-The placeholders above are conceptual; the runtime constructs the final argument array in server-side TypeScript. Web content cannot change the executable or add arbitrary arguments.
+WebSocket messages:
+
+```text
+{"type":"web/start","payload":{"goal":"...","max_pages":10,"max_depth":2,"time_budget_minutes":15}}
+{"type":"web/cancel","payload":{"task_id":"web-..."}}
+```
+
+The runtime streams `web/event` messages for task start, page visits, skipped pages, completion, and cancellation. Completion includes the synthesized answer and citations.
+
+## Code Agent MVP
+
+The Phase 1 `BDS:LOCAL_EXEC` implementation remains available with explicit language enablement, argument-array execution, 15-second one-shot timeouts, output limits, process cleanup, and SQLite audit events.
 
 ## Chrome integration overlay
 
-`../extension-integration/` contains the drop-in runtime client, tag bridge, and status UI intended to be imported into the existing Better DeepSeek MV3 extension. This remains an integration overlay, not a replacement extension.
+`../extension-integration/` contains the drop-in runtime client, tag bridge, and status UI intended to be imported into the existing Better DeepSeek MV3 extension. The UI now renders Web Agent progress and source links. This remains an integration overlay, not a replacement extension.

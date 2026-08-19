@@ -18,4 +18,14 @@ describe("BDS tag parser", () => {
     expect(tag.attributes.show).toBe(true);
     expect(Object.keys(tag.attributes)).toEqual(["show"]);
   });
+
+  it("terminates when the input contains only the final tag", () => {
+    const input = `BDS:AGENT_STATUS\nshow = true\n`;
+    expect(parseBdsTags(input)).toEqual([
+      expect.objectContaining({
+        name: "AGENT_STATUS",
+        attributes: { show: true },
+      }),
+    ]);
+  });
 });

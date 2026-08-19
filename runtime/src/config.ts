@@ -7,8 +7,8 @@ export const DB_PATH = process.env.BDS_RUNTIME_DB ?? "./data/runtime.db";
 export const WORKSPACE = path.resolve(process.env.BDS_WORKSPACE ?? process.cwd());
 
 export const LIMITS = {
-  wsMessageBytes: 12 * 1024 * 1024,
-  httpBodyBytes: 10 * 1024 * 1024,
+  wsMessageBytes: 256 * 1024,
+  httpBodyBytes: 512 * 1024,
   auditPayloadBytes: 64 * 1024,
   maxAuditRows: 10000,
   maxMemoryBytes: 2 * 1024 * 1024 * 1024,

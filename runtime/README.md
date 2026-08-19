@@ -1,122 +1,177 @@
-# Better DeepSeek Local Runtime — Phase 3
+# Better DeepSeek Local Runtime — Phase 5
 
-This directory contains the local-only runtime for Better DeepSeek, including native Code Agent execution, read-only Web Agent research, and the MathBridge equation-analysis MVP.
+This directory contains the local-first runtime required by the Better DeepSeek agent architecture, including the native Code Agent, Web Agent MVP/production layer, MathBridge MVP, and MathBridge production document pipeline.
 
 ## Security boundary
 
-- Listens only on `127.0.0.1`.
-- Every authenticated REST request uses `Authorization: Bearer <token>`.
-- WebSocket clients authenticate with a token in their first message; unauthenticated sockets are closed after 5 seconds.
-- The runtime never binds to `0.0.0.0` and does not expose a public API.
-- SQLite state and audit data stay under `runtime/data/` and are ignored by Git.
-- No cloud upload is implemented by the runtime.
-- Code execution uses server-side language allowlists and argument arrays only.
-- Web research is read-only and must not log in, submit forms, post, bypass paywalls, or solve CAPTCHAs.
-- MathBridge processes equation content locally; remote OCR APIs are not used.
-- OCR results always carry a confidence value when the local engine supplies one; otherwise the result explicitly reports confidence as unavailable.
+- Runtime services listen only on `127.0.0.1`.
+- Authenticated APIs require `Authorization: Bearer <token>`.
+- WebSocket clients authenticate with the same local token.
+- The runtime never accepts raw shell command strings.
+- Code tools operate only inside `BDS_WORKSPACE` unless a future explicitly approved extension permits otherwise.
+- `.env`, SSH keys, token files, `.git`, and dependency trees are excluded from default code search/file access.
+- Destructive code actions require an expiring approval.
+- No package installation, sudo, login, or account changes are performed by the Code Agent.
+- No telemetry or cloud upload is implemented by the runtime by default.
 
 ## Setup
 
 ```bash
 cd runtime
 npm install
+npx playwright install chromium
 TOKEN=$(node scripts/setup-token.mjs)
 export BDS_RUNTIME_TOKEN="$TOKEN"
-export BDS_WORKSPACE="/absolute/path/to/your/project"
+export BDS_SESSION_KEY="$(openssl rand -hex 32)"
+export BDS_WORKSPACE="/absolute/path/to/project"
+export BDS_DOCUMENT_ROOT="/absolute/path/to/papers"
+export BDS_DEEPSEEK_API_KEY="<your-key>"
+export BDS_DEEPSEEK_MODEL="deepseek-v4-pro"
 npm run build
 npm start
 ```
 
-`setup-token` prints a token instead of writing it to disk. Keep it local and store it only in the existing Better DeepSeek extension's `chrome.storage.local` through the runtime bridge.
+The main runtime listens on port `3037` by default. The production Code Agent runs in the same Node process on `3038` by default (`BDS_CODE_PORT` can override it). Both services bind only to `127.0.0.1`.
 
-### MathBridge OCR engines
+DeepSeek's current API is OpenAI-compatible at `https://api.deepseek.com`, supports V4-Pro/V4-Flash, and supports function/tool calling. The runtime sends only the explicitly selected workspace context and tool-call messages; secrets are not part of the default tool surface. urlDeepSeek API documentationhttps://api-docs.deepseek.com/quick_start/pricing-details-cny/
 
-The MVP is local-first. Install one or both Python OCR engines on the same machine when image equations need OCR:
+## Production Code Agent
 
-```bash
-python3 -m pip install pix2tex
-python3 -m pip install pix2text
-```
+The production Code Agent implements the workspace/tool execution plane described by the specification.
 
-`pix2tex` is the primary image-to-LaTeX engine. `Pix2Text` is the fallback and can return structured recognition scores. urlpix2tex CLI sourcehttps://github.com/lukas-blecher/LaTeX-OCR/blob/main/pix2tex/cli.py urlPix2Text usage sourcehttps://github.com/breezedeus/Pix2Text/blob/main/docs/usage.md
-
-### Environment
+### Tag
 
 ```text
-BDS_RUNTIME_PORT=3037
-BDS_RUNTIME_TOKEN=<32+ character token>
-BDS_RUNTIME_DB=./data/runtime.db
-BDS_WORKSPACE=/absolute/path/to/project
+BDS:CODE_AGENT
+  task = "Fix the failing Lean 4 proof"
+  workspace = "/absolute/path/to/project"
+  max_iterations = 30
+  approval = "auto_for_known"
+  tools = ["fs", "shell", "git", "lean4"]
 ```
 
-For Lean 4, `BDS_WORKSPACE` should point at the local Lake project. Zig and Python one-shot programs run in isolated temporary directories.
-
-## Phase 3 endpoints
+The extension routes `BDS:CODE_AGENT` over the dedicated authenticated Code Agent WebSocket:
 
 ```text
-GET  /health
-GET  /v1/health
-GET  /v1/status                       authenticated
-GET  /v1/code/languages               authenticated
-POST /v1/code/languages/enable        authenticated
-POST /v1/code/execute                 authenticated
-POST /v1/web/start                    authenticated
-GET  /v1/web/status/:task_id          authenticated
-POST /v1/web/cancel                   authenticated
-POST /v1/math/analyze                 authenticated
-GET  /v1/math/result/:id              authenticated
-POST /v1/tags/parse                   authenticated
-POST /v1/audit                        authenticated
-WS   /ws                              authenticated after first message
+WS ws://127.0.0.1:3038/code/ws
 ```
 
-## MathBridge input
-
-Direct LaTeX:
-
-```json
-{"kind":"latex","content":"\\int_0^\\infty e^{-x^2}dx"}
-```
-
-MathML containing an `application/x-tex` annotation:
-
-```json
-{"kind":"mathml","content":"<math>...</math>"}
-```
-
-Image equations use a `data:image/...;base64,...` payload and are processed locally through pix2tex, then Pix2Text if configured as the fallback.
-
-Response shape:
-
-```json
-{
-  "latex": "\\int_0^\\infty e^{-x^2}dx",
-  "confidence": 0.94,
-  "alternatives": [],
-  "engine": "pix2tex",
-  "rendered_html": "<span class=\"katex\">...</span>",
-  "source": {
-    "kind": "image",
-    "source_url": "https://example.com/paper",
-    "page_title": "Paper title"
-  }
-}
-```
-
-The runtime validates the resulting LaTeX with KaTeX before returning it. Invalid LaTeX never becomes a successful render result.
-
-## BDS:MATH_ANALYZE
+### Production APIs
 
 ```text
-BDS:MATH_ANALYZE
-type = "equation"
-kind = "latex"
-content = "x^2 + y^2 = z^2"
-engine = "auto"
+GET    /code/health
+GET    /code/workspace
+POST   /code/workspace/index
+POST   /code/tasks
+GET    /code/tasks/:id
+POST   /code/tasks/:id/pause
+POST   /code/tasks/:id/resume
+POST   /code/tasks/:id/cancel
+POST   /code/tools/:tool
+POST   /code/approvals/:id
+GET    /code/memory
+WS     /code/ws
 ```
 
-The Chrome integration overlay includes `bds-mathbridge.js`, which detects selected MathML/KaTeX/MathJax/image equations and exposes an `Analyze equation` action. The result card provides editable LaTeX, a rendered preview, confidence/engine information, and a Copy LaTeX action. Editor changes are sent back through the local runtime for re-validation and rendering.
+### Tool surface
 
-## Local-only policy
+Low-risk tools include file reading, directory listing, code search, Git status/diff, LSP diagnostics, and workspace memory.
 
-Do not configure Mathpix or another remote OCR service unless the user explicitly opts into that integration. The Phase 3 runtime has no implicit cloud OCR path.
+Medium-risk tools include targeted file edits, file writes, project builds/tests, compiler/prover checks, and explicitly argument-array based `shell.run`.
+
+High-risk tools include file deletion and Git commit. They create five-minute approvals containing the exact tool and arguments. Approval is required before the destructive action executes.
+
+The runtime validates all model-generated tool-call JSON before execution. Every executable is selected from a server-side allowlist; shell commands are always arrays passed to `spawn()` with `shell:false`.
+
+### Agent loop
+
+```text
+task
+ → DeepSeek tool-call planner
+ → inspect workspace
+ → search/read
+ → targeted edit
+ → compile/test/proof check
+ → inspect error
+ → repeat
+ → final summary
+```
+
+The loop is bounded by `max_iterations` (1–30). Tasks and checkpoints are persisted in SQLite. Pause/resume/cancel are checked between model and tool turns.
+
+### Workspace memory
+
+Repo-specific memory is stored in SQLite using `(workspace, key)` and is accessible through the Code Agent memory endpoint. The memory layer remains local and is scoped to the configured workspace.
+
+### First-class compiler/prover commands
+
+The server-side command map includes adapters for Zig, Lean 4/Lake, Rust/Cargo, Coq, Isabelle, Python/pytest, and SageMath. Languages can remain disabled for the existing one-shot `BDS:LOCAL_EXEC` path, while production compiler checks are still constrained to the fixed command map.
+
+## MathBridge production
+
+### PDF → MathIR
+
+```text
+BDS:MATH_PDF
+  file = "/absolute/path/to/papers/paper.pdf"
+  mode = "full"
+  output = "mathir"
+```
+
+REST:
+
+```text
+POST /v1/math/pdf
+GET  /v1/math/documents
+GET  /v1/math/documents/:id
+DELETE /v1/math/documents/:id
+```
+
+### MathIR reasoning
+
+```text
+BDS:MATH_ASK
+  document_id = "doc_001"
+  question = "Explain the proof of Theorem 5.2"
+```
+
+REST:
+
+```text
+POST /v1/math/ask
+```
+
+Only retrieved MathIR context is eligible for reasoning; the original PDF is not automatically forwarded.
+
+### TikZ
+
+```text
+BDS:TIKZ_RENDER
+  source = "\\begin{tikzpicture}..."
+  output = "svg"
+```
+
+REST:
+
+```text
+POST /v1/math/tikz
+```
+
+The existing MathBridge MVP and production validation layers remain active.
+
+## Production Web Agent
+
+```text
+POST   /tasks
+GET    /tasks/:id
+GET    /tasks/:id/events
+POST   /tasks/:id/pause
+POST   /tasks/:id/resume
+POST   /tasks/:id/cancel
+POST   /approvals/:id
+GET    /sessions
+POST   /sessions
+POST   /sessions/:name/save
+DELETE /sessions/:name
+WS     /ws
+```

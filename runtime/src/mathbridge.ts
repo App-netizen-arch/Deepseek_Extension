@@ -47,9 +47,9 @@ function normalizeLatex(value: string): string {
 
 function mathmlToLatex(value: string): string {
   const input = value.trim();
-  const annotation = input.match(/<annotation[^>]*encoding=["']application\\/x-tex["'][^>]*>([\\s\\S]*?)<\\/annotation>/i);
+  const annotation = input.match(/<annotation[^>]*encoding=["']application\/x-tex["'][^>]*>([\s\S]*?)<\/annotation>/i);
   if (annotation) return normalizeLatex(annotation[1]);
-  const semantics = input.match(/<semantics[^>]*>[\\s\\S]*?<annotation[^>]*>([\\s\\S]*?)<\\/annotation>[\\s\\S]*?<\\/semantics>/i);
+  const semantics = input.match(/<semantics[^>]*>[\s\S]*?<annotation[^>]*>([\s\S]*?)<\/annotation>[\s\S]*?<\/semantics>/i);
   if (semantics) return normalizeLatex(semantics[1]);
   throw new Error("MathML has no embedded application/x-tex annotation");
 }
@@ -116,11 +116,8 @@ async function runPix2Tex(imagePath: string): Promise<{ latex: string; confidenc
   const result = await runProcess("python3", ["-m", "pix2tex", imagePath], OCR_TIMEOUT_MS);
   if (result.timedOut) throw new Error("pix2tex timed out");
   if (result.code !== 0) throw new Error(`pix2tex exited with ${result.code}: ${result.stderr.trim()}`);
-  const lines = result.stdout.trim().split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-  const candidates = lines.reverse();
-  const raw = candidates.find((line) => line.includes("\\"));
-  if (!raw) throw new Error("pix2tex returned no LaTeX");
-  const latex = raw.includes(": ") ? raw.slice(raw.indexOf(": ") + 2) : raw;
+  const latex = result.stdout.includes("\\") ? result.stdout.trim().split(/\r?\n/).filter(Boolean).at(-1) ?? "" : "";
+  if (!latex) throw new Error("pix2tex returned no LaTeX");
   return { latex: normalizeLatex(latex), confidence: null };
 }
 
@@ -142,7 +139,7 @@ async function imageBytes(content: string): Promise<Buffer> {
 
 export async function analyzeMath(request: MathAnalyzeRequest, store: RuntimeStore): Promise<MathAnalyzeResult> {
   if (!request || typeof request.content !== "string" || !request.content.trim()) throw new Error("math content is required");
-  if (!["latex", "mathml", "image"].includes(request.kind)) throw new Error("unsupported math input kind");
+  if (!['latex', 'mathml', 'image'].includes(request.kind)) throw new Error("unsupported math input kind");
   if (Buffer.byteLength(request.content, "utf8") > MAX_CONTENT_BYTES) throw new Error("math input exceeds 8 MiB limit");
 
   const id = randomUUID();

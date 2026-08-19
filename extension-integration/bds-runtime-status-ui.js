@@ -1,154 +1,25 @@
 export function createBdsRuntimeStatusUI({ root, client }) {
   const panel = document.createElement("div");
   panel.dataset.bdsRuntimeStatus = "true";
-  panel.style.cssText = "font:12px system-ui,sans-serif;padding:8px;border:1px solid #888;border-radius:8px;background:#fff;color:#111;max-width:520px;white-space:pre-wrap;";
+  panel.style.cssText = "font:12px system-ui,sans-serif;padding:8px;border:1px solid #888;border-radius:8px;background:#fff;color:#111;max-width:760px;white-space:pre-wrap;";
   panel.textContent = "Better DeepSeek runtime: checking…";
   root.appendChild(panel);
-
-  const render = (state) => {
-    const status = state?.status || "offline";
-    panel.textContent = `Better DeepSeek runtime: ${status}`;
-    panel.dataset.status = status;
-  };
-
-  const renderResult = (result) => {
-    const title = `LOCAL_EXEC ${result?.language || "unknown"} · ${result?.timed_out ? "timeout" : `exit ${result?.exit_code ?? "?"}`}`;
-    const output = [
-      result?.stdout ? `stdout:\n${result.stdout}` : "stdout: (empty)",
-      result?.stderr ? `stderr:\n${result.stderr}` : "stderr: (empty)",
-    ].join("\n\n");
-    panel.textContent = `${title}\n${output}${result?.truncated ? "\n\n[output truncated]" : ""}`;
-    panel.dataset.status = result?.timed_out ? "timeout" : "complete";
-  };
-
-  const addWebCard = (result) => {
-    if (!result || typeof result !== "object") return;
-    const card = document.createElement("section");
-    card.dataset.bdsWebAgentResult = "true";
-    card.style.cssText = "margin-top:8px;padding:10px;border:1px solid #aaa;border-radius:10px;background:#fafafa;color:#111;max-width:680px;white-space:pre-wrap;";
-
-    const heading = document.createElement("strong");
-    heading.textContent = `Web Agent — ${result.pages_visited ?? 0} pages`;
-    card.appendChild(heading);
-
-    const answer = document.createElement("div");
-    answer.style.marginTop = "8px";
-    answer.textContent = String(result.answer ?? "No answer returned.");
-    card.appendChild(answer);
-
-    const citations = Array.isArray(result.citations) ? result.citations : [];
-    if (citations.length) {
-      const listHeading = document.createElement("div");
-      listHeading.style.cssText = "margin-top:10px;font-weight:600;";
-      listHeading.textContent = "Sources";
-      card.appendChild(listHeading);
-      const list = document.createElement("ol");
-      list.style.margin = "6px 0 0 18px";
-      for (const citation of citations) {
-        const item = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = String(citation.source_url ?? "");
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.textContent = String(citation.source_title || citation.source_url || "source");
-        item.appendChild(link);
-        list.appendChild(item);
-      }
-      card.appendChild(list);
-    }
-    root.appendChild(card);
-  };
-
-  const addMathCard = (payload) => {
-    const result = payload?.result;
-    if (!result || typeof result.latex !== "string") return;
-    root.querySelectorAll('[data-bdsMathResult="true"]').forEach((node) => node.remove());
-
-    const card = document.createElement("section");
-    card.dataset.bdsMathResult = "true";
-    card.style.cssText = "margin-top:8px;padding:12px;border:1px solid #aaa;border-radius:10px;background:#fafafa;color:#111;max-width:680px;white-space:normal;";
-
-    const heading = document.createElement("strong");
-    heading.textContent = `MathBridge — ${result.engine}${result.confidence == null ? " · confidence unavailable" : ` · confidence ${(result.confidence * 100).toFixed(1)}%`}`;
-    card.appendChild(heading);
-
-    const source = document.createElement("div");
-    source.style.cssText = "margin-top:8px;color:#666;";
-    source.textContent = result.source?.page_title ? `Source: ${result.source.page_title}` : "Source: selection";
-    card.appendChild(source);
-
-    const label = document.createElement("div");
-    label.style.cssText = "margin-top:10px;font-weight:600;";
-    label.textContent = "Editable LaTeX";
-    card.appendChild(label);
-
-    const editor = document.createElement("textarea");
-    editor.value = result.latex;
-    editor.rows = Math.min(8, Math.max(2, result.latex.split("\n").length));
-    editor.style.cssText = "width:100%;box-sizing:border-box;margin-top:6px;padding:8px;border:1px solid #bbb;border-radius:7px;font:13px ui-monospace,SFMono-Regular,monospace;resize:vertical;";
-    card.appendChild(editor);
-
-    const actions = document.createElement("div");
-    actions.style.cssText = "display:flex;gap:6px;margin-top:7px;";
-    const copy = document.createElement("button");
-    copy.type = "button";
-    copy.textContent = "Copy LaTeX";
-    copy.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(editor.value); copy.textContent = "Copied"; setTimeout(() => { copy.textContent = "Copy LaTeX"; }, 900); }
-      catch { copy.textContent = "Copy failed"; }
-    });
-    actions.appendChild(copy);
-    card.appendChild(actions);
-
-    const previewLabel = document.createElement("div");
-    previewLabel.style.cssText = "margin-top:10px;font-weight:600;";
-    previewLabel.textContent = "Rendered equation";
-    card.appendChild(previewLabel);
-
-    const preview = document.createElement("div");
-    preview.style.cssText = "margin-top:6px;overflow:auto;padding:8px;background:#fff;border:1px solid #ddd;border-radius:7px;";
-    preview.innerHTML = String(result.rendered_html ?? "");
-    card.appendChild(preview);
-
-    let timer;
-    editor.addEventListener("input", () => {
-      clearTimeout(timer);
-      timer = setTimeout(async () => {
-        try {
-          const event = await client.requestAndWait?.({ type: "math/analyze", payload: { kind: "latex", content: editor.value, source: "editor" } });
-          if (event?.type === "math/result") preview.innerHTML = String(event.payload?.result?.rendered_html ?? "");
-        } catch {
-          // The runtime event stream will surface validation errors through the normal handler.
-        }
-      }, 300);
-    });
-
-    root.appendChild(card);
-  };
-
+  const render = (state) => { const status = state?.status || "offline"; panel.textContent = `Better DeepSeek runtime: ${status}`; panel.dataset.status = status; };
+  const appendCard = (title, text, attr = "bdsMathCard") => { const card = document.createElement("section"); card.dataset[attr] = "true"; card.style.cssText = "margin-top:8px;padding:10px;border:1px solid #aaa;border-radius:10px;background:#fafafa;color:#111;max-width:760px;"; const heading = document.createElement("strong"); heading.textContent = title; card.appendChild(heading); const pre = document.createElement("pre"); pre.style.cssText = "margin:8px 0 0;white-space:pre-wrap;font:12px ui-monospace,monospace;"; pre.textContent = String(text || ""); card.appendChild(pre); root.appendChild(card); return card; };
+  const addWebCard = (result) => { if (!result || typeof result !== "object") return; const card = document.createElement("section"); card.dataset.bdsWebAgentResult = "true"; card.style.cssText = "margin-top:8px;padding:10px;border:1px solid #aaa;border-radius:10px;background:#fafafa;color:#111;max-width:760px;white-space:pre-wrap;"; const heading = document.createElement("strong"); heading.textContent = `Web Agent — ${result.pages_visited ?? 0} pages`; card.appendChild(heading); const answer = document.createElement("div"); answer.style.marginTop = "8px"; answer.textContent = typeof result.answer === "string" ? result.answer : result.goal ? `Research completed for: ${result.goal}` : "No answer returned."; card.appendChild(answer); const sources = Array.isArray(result.citations) ? result.citations : Array.isArray(result.sources) ? result.sources : []; if (sources.length) { const listHeading = document.createElement("div"); listHeading.style.cssText = "margin-top:10px;font-weight:600;"; listHeading.textContent = "Sources"; card.appendChild(listHeading); const list = document.createElement("ol"); list.style.margin = "6px 0 0 18px"; for (const source of sources.slice(0, 30)) { const item = document.createElement("li"); const link = document.createElement("a"); link.href = String(source.source_url || source.url || ""); link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = String(source.source_title || source.title || source.source_url || source.url || "source"); item.appendChild(link); list.appendChild(item); } card.appendChild(list); } root.appendChild(card); };
   const unsubscribe = client.onEvent((event) => {
     if (event?.type === "runtime/status") render(event.payload);
-    if (event?.type === "code/result") renderResult(event.payload);
-    if (event?.type === "math/result") addMathCard(event.payload);
-    if (event?.type === "web/event" && event.payload?.type === "page_visited") {
-      panel.textContent = `Web Agent: ${event.payload.payload?.pages_done ?? 0}/${event.payload.payload?.pages_total ?? "?"} pages`;
-      panel.dataset.status = "researching";
-    }
-    if (event?.type === "web/event" && event.payload?.type === "completed") {
-      panel.textContent = "Web Agent: complete";
-      panel.dataset.status = "complete";
-      addWebCard(event.payload.payload);
-    }
+    if (event?.type === "code/result") { const r=event.payload||{}; appendCard(`LOCAL_EXEC ${r.language||"unknown"} · ${r.timed_out?"timeout":`exit ${r.exit_code??"?"}`}`, [r.stdout?`stdout:\n${r.stdout}`:"stdout: (empty)",r.stderr?`stderr:\n${r.stderr}`:"stderr: (empty)",r.truncated?"[output truncated]":""].filter(Boolean).join("\n\n")); }
+    if (event?.type === "code/event") { const e=event.payload||{}; const p=e.payload||{}; if(e.type==="started") { panel.textContent=`Code Agent: started in ${p.workspace||"workspace"}`; panel.dataset.status="running"; } else if(e.type==="model_step") { panel.textContent=`Code Agent: reasoning step ${Number(p.iteration??0)+1}`; panel.dataset.status="reasoning"; } else if(e.type==="tool_call") { appendCard(`Code Agent · tool call ${p.tool||""}`, JSON.stringify(p.args||{},null,2), "bdsCodeCard"); panel.dataset.status="tool"; } else if(e.type==="tool_result") { appendCard(`Code Agent · tool result ${p.tool||""}`, JSON.stringify(p.result||{},null,2), "bdsCodeCard"); } else if(e.type==="approval_required") { appendCard("Code Agent · approval required", `Tool: ${p.tool||""}\nRisk: ${p.risk||"high"}\nApproval ID: ${p.approval_id||""}`, "bdsCodeCard"); panel.dataset.status="approval"; } else if(e.type==="completed") { appendCard("Code Agent · completed", p.summary||"", "bdsCodeCard"); panel.dataset.status="complete"; } else if(e.type==="cancelled") { panel.textContent="Code Agent: cancelled"; panel.dataset.status="cancelled"; } else if(e.type==="failed") { panel.textContent=`Code Agent: failed — ${p.error||p.reason||"unknown error"}`; panel.dataset.status="failed"; } }
+    if (event?.type === "web/event" && event.payload?.type === "page_visited") { panel.textContent = `Web Agent: ${event.payload.payload?.pages_done ?? 0}/${event.payload.payload?.pages_total ?? "?"} pages`; panel.dataset.status = "researching"; }
+    if (event?.type === "web/event" && event.payload?.type === "completed") { panel.textContent = "Web Agent: complete"; panel.dataset.status = "complete"; addWebCard(event.payload.payload); }
+    if (event?.type === "web/production") { const type=event.payload?.type; const p=event.payload?.payload||{}; if(type==="approval_required")panel.textContent=`Web Agent: approval required\n${p.action||"action"} → ${p.target||"target"}\nApproval ID: ${p.approval_id}`; else if(type==="paused")panel.textContent="Web Agent: paused"; else if(type==="resumed")panel.textContent="Web Agent: resumed"; else if(type==="page_visited")panel.textContent=`Web Agent: ${p.pages_done??0}/${p.pages_total??"?"} pages`; else if(type==="completed"){panel.textContent="Web Agent: complete";addWebCard(p);} else if(type==="cancelled")panel.textContent="Web Agent: cancelled"; panel.dataset.status=String(type||"running"); }
+    if (event?.type === "math/result") { const r=event.payload||{}; appendCard(`MathBridge · ${r.engine||"direct"}`, `LaTeX:\n${r.latex||""}\n\nConfidence: ${r.confidence??"not reported"}`); }
+    if (event?.type === "math/pdf/result") { const d=event.payload?.document||{}; appendCard(`MathIR · ${d.title||d.id||"document"}`, [`document_id: ${d.id||""}`,`pages: ${d.pages??0}`,`sections: ${d.sections?.length??0}`,`equations: ${d.equations?.length??0}`,`theorems: ${d.theorems?.length??0}`,`figures: ${d.figures?.length??0}`,`tables: ${d.tables?.length??0}`,`references: ${d.references?.length??0}`].join("\n")); }
+    if (event?.type === "math/ask/result") appendCard(`Math Q&A · ${event.payload?.provider||"local-context"}`,event.payload?.answer||"");
+    if (event?.type === "math/tikz/result") { const r=event.payload||{}; appendCard(`TikZ · ${r.validated?"validated":"failed"}`,r.source||""); if(typeof r.svg==="string"&&r.svg.includes("<svg")){const box=document.createElement("section");box.dataset.bdsMathCard="true";box.style.cssText="margin-top:8px;padding:10px;border:1px solid #aaa;border-radius:10px;background:#fafafa;overflow:auto;";box.innerHTML=r.svg;root.appendChild(box);} }
     if (event?.type === "runtime/error") render({ status: `error: ${event?.payload?.message || "unknown"}` });
   });
-
-  client.status().then((state) => {
-    render({ status: state?.ok ? (state.status || "ready") : (state.status || "offline") });
-  });
-
-  return () => {
-    unsubscribe();
-    panel.remove();
-    root.querySelectorAll('[data-bdsWebAgentResult="true"],[data-bdsMathResult="true"]').forEach((node) => node.remove());
-  };
+  client.status().then((state) => render({ status: state?.ok ? (state.status || "ready") : (state.status || "offline") }));
+  return () => { unsubscribe(); panel.remove(); root.querySelectorAll('[data-bdsWebAgentResult="true"],[data-bdsMathCard="true"],[data-bdsCodeCard="true"]').forEach((node) => node.remove()); };
 }

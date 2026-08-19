@@ -5,9 +5,11 @@ export const DB_PATH = process.env.BDS_RUNTIME_DB ?? "./data/runtime.db";
 
 export const LIMITS = {
   wsMessageBytes: 256 * 1024,
-  httpBodyBytes: 256 * 1024,
+  httpBodyBytes: 512 * 1024,
   auditPayloadBytes: 64 * 1024,
   maxAuditRows: 10000,
+  maxMemoryBytes: 2 * 1024 * 1024 * 1024,
+  maxConcurrentJobs: 3,
 };
 
 export function assertConfiguration(): void {

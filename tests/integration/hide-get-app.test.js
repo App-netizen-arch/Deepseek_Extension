@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { hideGetAppButton } from "../../src/android/hide-get-app.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { hideGetAppButton } from "../../src/content/hide-get-app.js";
 
 function makeGetAppButton() {
   const container = document.createElement("div");
@@ -24,12 +24,9 @@ describe("hideGetAppButton", () => {
   });
 
   afterEach(() => {
-    // Disconnect live observer so it doesn't bleed between tests.
     window.__bdsGetAppObserver?.disconnect();
     delete window.__bdsGetAppObserver;
   });
-
-  // ── immediate detection ────────────────────────────────────────────────
 
   it("hides the container div that wraps the button", () => {
     const { container } = makeGetAppButton();
@@ -87,8 +84,6 @@ describe("hideGetAppButton", () => {
     expect(() => hideGetAppButton()).not.toThrow();
   });
 
-  // ── idempotency ────────────────────────────────────────────────────────
-
   it("skips setup when __bdsGetAppObserver already set", () => {
     const sentinel = { disconnect: vi.fn() };
     window.__bdsGetAppObserver = sentinel;
@@ -97,8 +92,6 @@ describe("hideGetAppButton", () => {
     expect(container.hasAttribute("data-bds-hide")).toBe(false);
     expect(window.__bdsGetAppObserver).toBe(sentinel);
   });
-
-  // ── MutationObserver: deferred detection ──────────────────────────────
 
   it("hides container added to DOM after initial call", async () => {
     hideGetAppButton();
@@ -110,8 +103,6 @@ describe("hideGetAppButton", () => {
     hideGetAppButton();
     expect(window.__bdsGetAppObserver).toBeTruthy();
   });
-
-  // ── SPA persistence: observer stays alive after first hide ────────────
 
   it("re-hides button when removed and re-inserted (SPA nav)", async () => {
     const { container } = makeGetAppButton();
@@ -130,8 +121,6 @@ describe("hideGetAppButton", () => {
     expect(c1.hasAttribute("data-bds-hide")).toBe(true);
     expect(c2.hasAttribute("data-bds-hide")).toBe(true);
   });
-
-  // ── text-content resilience ────────────────────────────────────────────
 
   it("trims whitespace when matching span text", () => {
     const container = document.createElement("div");

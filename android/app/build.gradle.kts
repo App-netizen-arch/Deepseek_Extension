@@ -10,7 +10,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    
+
     defaultConfig {
         applicationId = "com.betterdeepseek.app"
         minSdk = 26
@@ -21,20 +21,30 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val ciKeystore = rootProject.file("ci-release.jks")
+    val hasCiKeystore = ciKeystore.isFile
+
     buildTypes {
         debug {
             isMinifyEnabled = false
         }
         signingConfigs {
             create("release") {
-                storeFile = rootProject.file("ci-release.jks")
+                storeFile = ciKeystore
                 storePassword = System.getenv("BDS_KEYSTORE_PASSWORD") ?: ""
                 keyAlias = System.getenv("BDS_KEY_ALIAS") ?: ""
                 keyPassword = System.getenv("BDS_KEY_PASSWORD") ?: ""
             }
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Prefer the real CI release key when it is present. On public CI without
+            // signing secrets, fall back to the standard debug key so the build can be
+            // compiled and verified without committing a private keystore.
+            signingConfig = if (hasCiKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

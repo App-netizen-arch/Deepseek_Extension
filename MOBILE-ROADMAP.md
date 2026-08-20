@@ -1,1 +1,0 @@
-The mobile companion is intentionally deferred. When implemented, it will be a separate Flutter/Dart project and will communicate with the Better DeepSeek local runtime through its supported local/API interfaces.

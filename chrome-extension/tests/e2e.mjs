@@ -17,7 +17,7 @@ await fs.access(path.join(extensionPath, "manifest.json"));
 await fs.rm(userDataDir, { recursive: true, force: true });
 
 const context = await chromium.launchPersistentContext(userDataDir, {
-  headless: true,
+  headless: false,
   args: [
     `--disable-extensions-except=${extensionPath}`,
     `--load-extension=${extensionPath}`,

@@ -1,9 +1,17 @@
 function hideMatchingGetAppButtons() {
   const candidates = document.querySelectorAll("button, .ds-button");
-  for (const button of candidates) {
-    const text = button.textContent?.trim() ?? "";
+
+  for (const element of candidates) {
+    const text = element.textContent?.trim() ?? "";
     if (text !== "Get App") continue;
-    button.setAttribute("data-bds-hide", "true");
+
+    if (element.matches(".ds-button")) {
+      element.setAttribute("data-bds-hide", "true");
+      continue;
+    }
+
+    const container = element.parentElement;
+    (container ?? element).setAttribute("data-bds-hide", "true");
   }
 }
 

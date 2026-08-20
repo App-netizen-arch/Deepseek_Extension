@@ -15,10 +15,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: runtime/package-lock.json
+          cache-dependency-path: runtime/package.json
       - name: Install runtime dependencies
         working-directory: runtime
-        run: npm ci
+        run: npm install
       - name: Build runtime
         working-directory: runtime
         run: npm run build

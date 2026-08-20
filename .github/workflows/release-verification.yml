@@ -67,5 +67,5 @@ jobs:
           fi
 
           cat /tmp/bds-status.json
-          (cd runtime && node ../chrome-extension/tests/e2e.mjs)
+          xvfb-run -a node chrome-extension/tests/e2e.mjs
           BDS_RUNTIME_TOKEN=$BDS_RUNTIME_TOKEN node runtime/scripts/security-smoke.mjs

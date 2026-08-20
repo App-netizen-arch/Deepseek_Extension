@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   DRAWER_APP_ITEM_TEXT,
   hideDrawerAppItem,
-} from "../../src/android/hide-drawer-app-item.js";
+} from "../../src/content/hide-drawer-app-item.js";
 
 /** Creates a .ds-dropdown-menu matching DeepSeek's real DOM structure. */
 function makeMenu(items = []) {
@@ -42,13 +42,9 @@ describe("hideDrawerAppItem", () => {
     delete window.__bdsDrawerItemObserver;
   });
 
-  // ── DRAWER_APP_ITEM_TEXT constant ─────────────────────────────────────
-
   it("DRAWER_APP_ITEM_TEXT is the exact target string", () => {
     expect(DRAWER_APP_ITEM_TEXT).toBe("Download mobile App");
   });
-
-  // ── immediate detection ────────────────────────────────────────────────
 
   it("hides the Download mobile App option", () => {
     makeMenu(STANDARD_ITEMS);
@@ -73,8 +69,6 @@ describe("hideDrawerAppItem", () => {
   it("does nothing when no .ds-dropdown-menu is present", () => {
     expect(() => hideDrawerAppItem()).not.toThrow();
   });
-
-  // ── exact match required ───────────────────────────────────────────────
 
   it("does not hide options with only partial text", () => {
     makeMenu([{ text: "Download App", testid: "item" }]);
@@ -106,8 +100,6 @@ describe("hideDrawerAppItem", () => {
     expect(document.querySelector('[data-testid="item"]').hasAttribute("data-bds-hide")).toBe(false);
   });
 
-  // ── idempotency ────────────────────────────────────────────────────────
-
   it("skips when __bdsDrawerItemObserver already set", () => {
     const sentinel = { disconnect: () => {} };
     window.__bdsDrawerItemObserver = sentinel;
@@ -121,8 +113,6 @@ describe("hideDrawerAppItem", () => {
     hideDrawerAppItem();
     expect(window.__bdsDrawerItemObserver).toBeTruthy();
   });
-
-  // ── MutationObserver: menu added after call ────────────────────────────
 
   it("hides option when .ds-dropdown-menu added after initial call", async () => {
     hideDrawerAppItem();
@@ -144,7 +134,6 @@ describe("hideDrawerAppItem", () => {
 
   it("does not affect per-chat menus that have no matching option", async () => {
     hideDrawerAppItem();
-    // Simulate a chat context menu (Rename/Pin/Share/Delete — no download item).
     makeMenu([
       { text: "Rename", testid: "chat-rename" },
       { text: "Pin", testid: "chat-pin" },
@@ -155,13 +144,10 @@ describe("hideDrawerAppItem", () => {
     expect(document.querySelector('[data-testid="chat-delete"]').hasAttribute("data-bds-hide")).toBe(false);
   });
 
-  // ── SPA persistence ───────────────────────────────────────────────────
-
   it("re-hides option when menu is removed and re-added (SPA nav)", async () => {
     const menu = makeMenu(STANDARD_ITEMS);
     hideDrawerAppItem();
     expect(document.querySelector('[data-testid="item-download"]').hasAttribute("data-bds-hide")).toBe(true);
-
     menu.remove();
     makeMenu(STANDARD_ITEMS);
     await vi.waitFor(() =>

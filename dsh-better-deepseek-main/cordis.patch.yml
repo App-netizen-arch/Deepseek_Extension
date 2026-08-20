@@ -1,5 +1,0 @@
-- insert:
-    - id: better-deepseek
-      name: 'dsh-better-deepseek'
-      config:
-        enableCors: true

@@ -2,7 +2,7 @@ name: Phase Verification
 
 on:
   push:
-    branches: [phase-0-local-runtime]
+    branches: [phase-0-local-runtime, phase-6-7-final]
   pull_request:
     branches: [main]
 

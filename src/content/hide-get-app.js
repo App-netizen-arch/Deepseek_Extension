@@ -1,17 +1,33 @@
+const HIDE_ATTR = "data-bds-hide";
+
+function installHideStyle() {
+  if (typeof document === "undefined") return;
+  if (document.querySelector(`style[data-bds-hide-style="true"]`)) return;
+
+  const style = document.createElement("style");
+  style.dataset.bdsHideStyle = "true";
+  style.textContent = `[${HIDE_ATTR}] { display: none !important; }`;
+  (document.head || document.documentElement).appendChild(style);
+}
+
+function getHideTarget(label) {
+  const control = label.closest?.("button, .ds-button, [role='button']");
+  if (!control) return null;
+  return control.matches?.(".ds-button")
+    ? control
+    : control.parentElement || control;
+}
+
 function hideMatchingGetAppButtons() {
-  const candidates = document.querySelectorAll("button, .ds-button");
+  installHideStyle();
 
-  for (const element of candidates) {
-    const text = element.textContent?.trim() ?? "";
-    if (text !== "Get App") continue;
+  for (const span of document.querySelectorAll("span")) {
+    if (span.textContent?.trim() !== "Get App") continue;
 
-    if (element.matches(".ds-button")) {
-      element.setAttribute("data-bds-hide", "true");
-      continue;
+    const target = getHideTarget(span);
+    if (target && !target.hasAttribute(HIDE_ATTR)) {
+      target.setAttribute(HIDE_ATTR, "");
     }
-
-    const container = element.parentElement;
-    (container ?? element).setAttribute("data-bds-hide", "true");
   }
 }
 
@@ -20,10 +36,19 @@ export function hideGetAppButton() {
   if (window.__bdsGetAppObserver) return;
 
   hideMatchingGetAppButtons();
-  const observer = new MutationObserver(() => hideMatchingGetAppButtons());
-  observer.observe(document.documentElement || document.body, {
-    childList: true,
-    subtree: true,
+
+  let rafId = 0;
+  const observer = new MutationObserver(() => {
+    hideMatchingGetAppButtons();
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(hideMatchingGetAppButtons);
   });
+
+  observer.observe(document.body || document.documentElement, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+  });
+
   window.__bdsGetAppObserver = observer;
 }

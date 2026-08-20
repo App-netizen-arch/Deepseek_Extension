@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+import { chromium } from "../../runtime/node_modules/playwright/index.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 

@@ -15,10 +15,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: runtime/package.json
+          cache-dependency-path: runtime/package-lock.json
       - name: Install runtime dependencies
         working-directory: runtime
-        run: npm install
+        run: npm ci
       - name: Build runtime
         working-directory: runtime
         run: npm run build
@@ -36,14 +36,36 @@ jobs:
           BDS_RUNTIME_DB: ${{ runner.temp }}/bds-e2e.db
           BDS_WORKSPACE: ${{ github.workspace }}
           BDS_LOG_DIR: ${{ runner.temp }}/bds-logs
+          NODE_PATH: ${{ github.workspace }}/runtime/node_modules
         run: |
+          set -euo pipefail
           node runtime/dist/index.js > /tmp/bds-runtime.log 2>&1 &
           pid=$!
-          trap 'kill -TERM $pid 2>/dev/null || true; wait $pid 2>/dev/null || true' EXIT
-          for i in {1..60}; do
-            if curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status >/dev/null; then break; fi
+          cleanup() {
+            kill -TERM "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          ready=0
+          for i in $(seq 1 60); do
+            if curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status >/tmp/bds-status.json 2>/dev/null; then
+              ready=1
+              break
+            fi
+            if ! kill -0 "$pid" 2>/dev/null; then
+              echo "Runtime exited before becoming ready"
+              cat /tmp/bds-runtime.log
+              exit 1
+            fi
             sleep 1
           done
-          curl -fsS -H "Authorization: Bearer $BDS_RUNTIME_TOKEN" http://127.0.0.1:3037/v1/status
-          BDS_RUNTIME_TOKEN=$BDS_RUNTIME_TOKEN node chrome-extension/tests/e2e.mjs
+          if [ "$ready" -ne 1 ]; then
+            echo "Runtime did not become ready within 60 seconds"
+            cat /tmp/bds-runtime.log
+            exit 1
+          fi
+
+          cat /tmp/bds-status.json
+          (cd runtime && node ../chrome-extension/tests/e2e.mjs)
           BDS_RUNTIME_TOKEN=$BDS_RUNTIME_TOKEN node runtime/scripts/security-smoke.mjs

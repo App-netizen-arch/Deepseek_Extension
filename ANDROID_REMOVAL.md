@@ -1,5 +1,3 @@
-# Android layer removed
+# Android removal
 
-The native Android/Kotlin application is intentionally removed from this repository.
-
-The current project targets the browser extension plus the local Node.js runtime. A future mobile companion will be developed separately in Flutter/Dart.
+This repository currently targets the Better DeepSeek browser extension and its local Node.js runtime. Mobile will be added later as a separate Flutter/Dart companion project.

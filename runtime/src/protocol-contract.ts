@@ -48,6 +48,5 @@ export const CANONICAL_BDS_TAGS = Object.freeze([
   "AGENT_DEFINE","SUBAGENT","MCP_MANAGE","WORKFLOW","SKILL_LOAD","PERMISSION_SET","CONFIG_SET","SESSION_EXPORT",
   "VISUALIZER","COWORK","CODE_PANEL","CHAT_CLEAN",
 ] as const);
-
 export const ALLOWED_PHASE0_TAGS: ReadonlySet<string> = new Set(CANONICAL_BDS_TAGS);
 export function isCanonicalBdsTag(name: string): boolean { return (CANONICAL_BDS_TAGS as readonly string[]).includes(name); }

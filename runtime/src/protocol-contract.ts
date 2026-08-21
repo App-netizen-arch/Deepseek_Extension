@@ -1,54 +1,23 @@
 export const BDS_PROTOCOL_VERSION = 1 as const;
 
 export type BdsRequestKind =
-  | "status"
-  | "tags"
-  | "ping"
-  | "code/execute"
-  | "web/start"
-  | "web/cancel"
-  | "web/production/start"
-  | "web/production/pause"
-  | "web/production/resume"
-  | "web/production/cancel"
-  | "math/analyze"
-  | "math/pdf"
-  | "math/ask"
-  | "math/tikz";
+  | "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel"
+  | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel"
+  | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz";
 
 export type BdsEventKind =
-  | "runtime/status"
-  | "runtime/tags"
-  | "runtime/error"
-  | "runtime/pong"
-  | "code/result"
-  | "web/event"
-  | "web/production"
-  | "math/result"
-  | "math/pdf/result"
-  | "math/ask/result"
-  | "math/tikz/result"
-  | "math/action-required";
+  | "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result"
+  | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result"
+  | "math/tikz/result" | "math/action-required";
 
 export interface BdsRequestEnvelope<T = unknown> {
-  version: typeof BDS_PROTOCOL_VERSION;
-  id: string;
-  type: BdsRequestKind;
-  timestamp: number;
-  sessionId?: string;
-  projectId?: string;
-  payload?: T;
+  version: typeof BDS_PROTOCOL_VERSION; id: string; type: BdsRequestKind; timestamp: number;
+  sessionId?: string; projectId?: string; payload?: T;
 }
 
 export interface BdsResponseEnvelope<T = unknown> {
-  version: typeof BDS_PROTOCOL_VERSION;
-  id: string;
-  type: BdsEventKind;
-  timestamp: number;
-  inReplyTo?: string;
-  ok: boolean;
-  payload?: T;
-  error?: { code: string; message: string };
+  version: typeof BDS_PROTOCOL_VERSION; id: string; type: BdsEventKind; timestamp: number;
+  inReplyTo?: string; ok: boolean; payload?: T; error?: { code: string; message: string };
 }
 
 export function makeRequest<T>(id: string, type: BdsRequestKind, payload?: T, context?: Pick<BdsRequestEnvelope, "sessionId" | "projectId">): BdsRequestEnvelope<T> {
@@ -74,37 +43,11 @@ export function validateRequestEnvelope(value: unknown): asserts value is BdsReq
 }
 
 export const CANONICAL_BDS_TAGS = Object.freeze([
-  "AGENT_STATUS",
-  "AGENT_CONTROL",
-  "LOCAL_EXEC",
-  "WEB_AGENT",
-  "MATH_ANALYZE",
-  "MATH_PDF",
-  "MATH_ASK",
-  "TIKZ_RENDER",
-  "CODE_AGENT",
-  "AGENT_LOGIN",
-  "MEMORY_WRITE",
-  "MEMORY_READ",
-  "MEMORY_LIST",
-  "MEMORY_DELETE",
-  "PROJECT_CONTEXT",
-  "AGENT_DEFINE",
-  "SUBAGENT",
-  "MCP_MANAGE",
-  "WORKFLOW",
-  "SKILL_LOAD",
-  "PERMISSION_SET",
-  "CONFIG_SET",
-  "SESSION_EXPORT",
-  "VISUALIZER",
-  "COWORK",
-  "CODE_PANEL",
-  "CHAT_CLEAN",
+  "AGENT_STATUS","AGENT_CONTROL","LOCAL_EXEC","WEB_AGENT","MATH_ANALYZE","MATH_PDF","MATH_ASK","TIKZ_RENDER",
+  "CODE_AGENT","AGENT_LOGIN","MEMORY_WRITE","MEMORY_READ","MEMORY_LIST","MEMORY_DELETE","PROJECT_CONTEXT",
+  "AGENT_DEFINE","SUBAGENT","MCP_MANAGE","WORKFLOW","SKILL_LOAD","PERMISSION_SET","CONFIG_SET","SESSION_EXPORT",
+  "VISUALIZER","COWORK","CODE_PANEL","CHAT_CLEAN",
 ] as const);
 
 export const ALLOWED_PHASE0_TAGS: ReadonlySet<string> = new Set(CANONICAL_BDS_TAGS);
-
-export function isCanonicalBdsTag(name: string): boolean {
-  return (CANONICAL_BDS_TAGS as readonly string[]).includes(name);
-}
+export function isCanonicalBdsTag(name: string): boolean { return (CANONICAL_BDS_TAGS as readonly string[]).includes(name); }

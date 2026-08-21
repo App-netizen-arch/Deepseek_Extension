@@ -15,4 +15,4 @@ export interface WsEvent {
   payload?: unknown;
 }
 
-export const ALLOWED_PHASE0_TAGS = new Set(CANONICAL_BDS_TAGS);
+export const ALLOWED_PHASE0_TAGS = new Set<string>(CANONICAL_BDS_TAGS);

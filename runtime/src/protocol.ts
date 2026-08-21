@@ -1,3 +1,4 @@
+import { CANONICAL_BDS_TAGS } from "./protocol-contract.js";
 export * from "./protocol-contract.js";
 
 export interface WsHello { type: "auth"; token: string; }

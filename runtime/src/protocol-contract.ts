@@ -103,6 +103,8 @@ export const CANONICAL_BDS_TAGS = Object.freeze([
   "CHAT_CLEAN",
 ] as const);
 
+export const ALLOWED_PHASE0_TAGS: ReadonlySet<string> = new Set(CANONICAL_BDS_TAGS);
+
 export function isCanonicalBdsTag(name: string): boolean {
   return (CANONICAL_BDS_TAGS as readonly string[]).includes(name);
 }

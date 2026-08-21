@@ -1,5 +1,4 @@
 export const BDS_PROTOCOL_VERSION = 1 as const;
-
 export type BdsRequestKind = "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel" | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel" | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz";
 export type BdsEventKind = "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result" | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result" | "math/tikz/result" | "math/action-required";
 export interface BdsRequestEnvelope<T = unknown> { version: typeof BDS_PROTOCOL_VERSION; id: string; type: BdsRequestKind; timestamp: number; sessionId?: string; projectId?: string; payload?: T; }

@@ -1,15 +1,7 @@
 export const BDS_PROTOCOL_VERSION = 1 as const;
 
-export type BdsRequestKind =
-  | "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel"
-  | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel"
-  | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz";
-
-export type BdsEventKind =
-  | "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result"
-  | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result"
-  | "math/tikz/result" | "math/action-required";
-
+export type BdsRequestKind = "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel" | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel" | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz";
+export type BdsEventKind = "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result" | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result" | "math/tikz/result" | "math/action-required";
 export interface BdsRequestEnvelope<T = unknown> { version: typeof BDS_PROTOCOL_VERSION; id: string; type: BdsRequestKind; timestamp: number; sessionId?: string; projectId?: string; payload?: T; }
 export interface BdsResponseEnvelope<T = unknown> { version: typeof BDS_PROTOCOL_VERSION; id: string; type: BdsEventKind; timestamp: number; inReplyTo?: string; ok: boolean; payload?: T; error?: { code: string; message: string }; }
 export function makeRequest<T>(id: string, type: BdsRequestKind, payload?: T, context?: Pick<BdsRequestEnvelope, "sessionId" | "projectId">): BdsRequestEnvelope<T> { return { version: BDS_PROTOCOL_VERSION, id, type, timestamp: Date.now(), ...(context?.sessionId ? { sessionId: context.sessionId } : {}), ...(context?.projectId ? { projectId: context.projectId } : {}), ...(payload === undefined ? {} : { payload }) }; }

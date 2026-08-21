@@ -1,0 +1,7703 @@
+Fail again :App-netizen-arch/Deepseek_Extension#11 and App-netizen-arch/Deepseek_Extension#12 and Run npm run build 
+
+
+
+> better-deepseek-local-runtime@0.3.0 build 
+
+
+
+> tsc -p tsconfig.json 
+
+
+
+Error: src/server.ts(109,295): error TS2345: Argument of type 'string' is not assignable to parameter of type '"MEMORY_WRITE" | "PROJECT_CONTEXT" | "MCP_MANAGE" | "WORKFLOW" | "AGENT_DEFINE" | "SUBAGENT" | "AGENT_STATUS" | "AGENT_CONTROL" | "LOCAL_EXEC" | "WEB_AGENT" | "MATH_ANALYZE" | ... 15 more ... | "CHAT_CLEAN"'. 
+
+
+
+Error: src/server.ts(129,280): error TS2345: Argument of type 'string' is not assignable to parameter of type '"MEMORY_WRITE" | "PROJECT_CONTEXT" | "MCP_MANAGE" | "WORKFLOW" | "AGENT_DEFINE" | "SUBAGENT" | "AGENT_STATUS" | "AGENT_CONTROL" | "LOCAL_EXEC" | "WEB_AGENT" | "MATH_ANALYZE" | ... 15 more ... | "CHAT_CLEAN"'. 
+
+
+
+Error: Process completed with exit code 2. 
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0sRun npm run build 
+
+
+
+> better-deepseek-local-runtime@0.3.0 build 
+
+
+
+> tsc -p tsconfig.json 
+
+
+
+Error: src/server.ts(109,295): error TS2345: Argument of type 'string' is not assignable to parameter of type '"MEMORY_WRITE" | "PROJECT_CONTEXT" | "MCP_MANAGE" | "WORKFLOW" | "AGENT_DEFINE" | "SUBAGENT" | "AGENT_STATUS" | "AGENT_CONTROL" | "LOCAL_EXEC" | "WEB_AGENT" | "MATH_ANALYZE" | ... 15 more ... | "CHAT_CLEAN"'. 
+
+
+
+Error: src/server.ts(129,280): error TS2345: Argument of type 'string' is not assignable to parameter of type '"MEMORY_WRITE" | "PROJECT_CONTEXT" | "MCP_MANAGE" | "WORKFLOW" | "AGENT_DEFINE" | "SUBAGENT" | "AGENT_STATUS" | "AGENT_CONTROL" | "LOCAL_EXEC" | "WEB_AGENT" | "MATH_ANALYZE" | ... 15 more ... | "CHAT_CLEAN"'. 
+
+
+
+Error: Process completed with exit code 2. 
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0sSkip to content
+
+
+
+App-netizen-arch
+
+Deepseek_Extension
+
+Repository navigation
+
+
+
+svgCode
+
+svgIssues
+
+svgPull requests2 (2)
+
+svgAgents
+
+svgActions
+
+svgProjects
+
+svgWiki
+
+svgSecurity and quality
+
+svgInsights
+
+svgSettings
+
+
+
+svgBack to pull request #11
+
+
+
+failed:
+
+docs: finalize mobile architecture and verify release baseline #16
+
+svgsvg
+
+
+
+svg
+
+
+
+
+
+All jobs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Run details
+
+
+
+
+
+
+
+svg
+
+Annotations
+
+10 errors and 1 warning
+
+
+
+Web / Extension
+
+
+
+failed 15 hours ago in 1m 26s
+
+
+
+svg
+
+
+
+svgShow options
+
+
+
+svgThis step passed
+
+
+
+1s
+
+
+
+svgThis step passed
+
+
+
+1s
+
+
+
+svgThis step passed
+
+
+
+7s
+
+
+
+svgThis step passed
+
+
+
+3s
+
+
+
+svgThis step passed
+
+
+
+5s
+
+
+
+svgThis step passed
+
+
+
+11s
+
+
+
+svgThis step passed
+
+
+
+7s
+
+
+
+svgThis step failed
+
+
+
+45s
+
+
+
+Run npm run test:unit 
+
+
+
+> better-deepseek@0.1.13 test:unit 
+
+
+
+> vitest run --coverage 
+
+
+
+ RUN  v3.2.4 /home/runner/work/Deepseek_Extension/Deepseek_Extension 
+
+
+
+Coverage enabled with v8 
+
+
+
+2:20:44 PM [vite-plugin-svelte] src/content/ui/CodeRunner.svelte:11:20 This reference only captures the initial value of `content`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+✓ tests/integration/storage.test.js (35 tests) 50ms 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1105:0 Unused CSS selector ".bds-message-overlay.rtl pre" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1106:0 Unused CSS selector ".bds-message-overlay.rtl code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1107:0 Unused CSS selector ".bds-message-overlay.rtl .bds-code-block" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1108:0 Unused CSS selector ".bds-message-overlay.rtl table" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1109:0 Unused CSS selector ".bds-message-overlay.rtl th" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1110:0 Unused CSS selector ".bds-message-overlay.rtl td" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1117:0 Unused CSS selector ".bds-message-overlay.rtl ul" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1118:0 Unused CSS selector ".bds-message-overlay.rtl ol" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1123:0 Unused CSS selector ".bds-message-overlay.rtl blockquote" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1131:0 Unused CSS selector ".bds-message-overlay.rtl th:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi))" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1134:0 Unused CSS selector ".bds-message-overlay.rtl th:not(:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)))" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/VisualizerCard.svelte:174:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/VisualizerCard.svelte:184:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/VisualizerCard.svelte:194:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+✓ tests/integration/background-persistence.test.js (25 tests) 53ms 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/AutoCodeResultCard.svelte:8:26 This reference only captures the initial value of `status`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:10:24 This reference only captures the initial value of `cleanSrc`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:11:28 This reference only captures the initial value of `cleanSrc`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:32:4 This reference only captures the initial value of `cleanSrc`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:32:27 This reference only captures the initial value of `query`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:128:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:128:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:176:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:10:52 This reference only captures the initial value of `attrs`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:10:65 This reference only captures the initial value of `attrs`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:691:2 Unused CSS selector ".bds-fallback-hint code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:45 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:824:2 Unused CSS selector ".bds-auto-inject-notice code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:44:23 This reference only captures the initial value of `nativeInput`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1189:10 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1412:10 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:54:6 `menuRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:73:6 `dialogRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:78:6 `projectBtnRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:79:6 `projectPanelRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1819:2 Unused CSS selector ".bds-attach-item--project" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1823:2 Unused CSS selector ".bds-attach-item--project:hover" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1828:2 Unused CSS selector ".bds-picker-row" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1838:2 Unused CSS selector ".bds-picker-row:last-child" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1842:2 Unused CSS selector ".bds-picker-row:hover" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1846:2 Unused CSS selector ".bds-picker-info" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1852:2 Unused CSS selector ".bds-picker-name" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1860:2 Unused CSS selector ".bds-picker-size" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1888:2 Unused CSS selector ".bds-project-btn--active" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:2095:2 Unused CSS selector ".bds-pp-confirm" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:2102:2 Unused CSS selector ".bds-pp-confirm-text" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:2107:2 Unused CSS selector ".bds-pp-confirm-actions" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:46 PM [vite-plugin-svelte] src/content/commands/CommandsHelp.svelte:38:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+✓ tests/integration/deep-research-parser.test.js (33 tests) 38ms 
+
+
+
+✓ tests/integration/whitespace-preservation.test.js (155 tests) 94ms 
+
+
+
+✓ src/content/parser/deep-code-parser.test.js (12 tests) 60ms 
+
+
+
+✓ src/lib/wikimedia-commons.test.js (16 tests) 15ms 
+
+
+
+✓ tests/integration/background-github.test.js (7 tests) 25ms 
+
+
+
+✓ tests/integration/deep-research-e2e.test.js (3 tests) 26ms 
+
+
+
+✓ src/content/parser/tag-parser.test.js (20 tests) 10ms 
+
+
+
+✓ src/content/parser/image-parser.test.js (19 tests) 37ms 
+
+
+
+✓ src/content/files/search-quality.test.js (6 tests) 12ms 
+
+
+
+✓ src/content/parser/json-repair.test.js (15 tests) 9ms 
+
+
+
+✓ src/content/parser/link-artifacts.test.js (10 tests) 10ms 
+
+
+
+✓ src/content/commands/commands.test.js (12 tests) 159ms 
+
+
+
+✓ src/content/parser/auto-code-runner.test.js (8 tests) 26ms 
+
+
+
+✓ src/lib/utils/html-utils.test.js (8 tests) 10ms 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:489:35 This reference only captures the initial value of `activeProject`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1275:2 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1322:6 Non-interactive element `<label>` cannot have interactive role 'button' 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_to_interactive_role 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1322:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1338:8 Non-interactive element `<label>` cannot have interactive role 'button' 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_to_interactive_role 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1338:8 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1379:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1385:12 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1395:14 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1414:12 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2083:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2083:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2084:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2084:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2115:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2130:12 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2147:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2147:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2148:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2148:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2170:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2170:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2171:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2171:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2203:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2207:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2211:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2383:2 Unused CSS selector ".bds-token-help code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+✓ src/lib/utils/file-path.test.js (7 tests) 7ms 
+
+
+
+✓ src/lib/utils/file-tree.test.js (5 tests) 8ms 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:210:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:264:8 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:264:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:274:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:320:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:320:0 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:49 PM [vite-plugin-svelte] src/content/ui/MemoryImport.svelte:80:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SavedItems.svelte:255:16 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SavedItems.svelte:255:16 `<span>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:8:21 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:8:28 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:9:23 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:9:30 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:11:31 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:39:0 `<div>` with a keydown handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:57:8 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+✓ tests/integration/deep-equal.test.js (11 tests) 7ms 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/QuestionPanel.svelte:521:12 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+✓ tests/integration/queue-manager.test.js (5 tests) 10ms 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/WhatsNewModal.svelte:74:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:44:27 This reference only captures the initial value of `content`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:231:12 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:241:12 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:251:12 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/ConfirmDialog.svelte:8:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/ConfirmDialog.svelte:9:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/ui/ConfirmDialog.svelte:9:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:87:0 `<div>` with a keydown handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:143:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:143:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:144:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:144:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:179:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:179:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:180:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:180:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:198:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:198:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:199:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:199:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:211:14 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:227:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:227:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:252:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:252:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:311:8 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:311:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:351:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:50 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:351:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+✓ src/lib/utils/helpers.test.js (6 tests) 11ms 
+
+
+
+✓ tests/integration/mount.test.js (10 tests) 6ms 
+
+
+
+✓ tests/integration/fixture-resolver.test.js (3 tests) 11ms 
+
+
+
+✓ src/lib/zip.test.js (3 tests) 13ms 
+
+
+
+✓ src/content/parser/memory-parser.test.js (6 tests) 8ms 
+
+
+
+✓ src/content/parser/text-sanitizer.test.js (3 tests) 8ms 
+
+
+
+✓ src/lib/utils/hash.test.js (4 tests) 12ms 
+
+
+
+stderr | tests/integration/deep-research-state.test.js > Deep Research state machine > adaptive step expansion > handleStepDone inserts valid adaptive search steps after the completed step 
+
+
+
+[BDS:DEEP_RESEARCH] Step a1 failed: Error: Search returned no results 
+
+
+
+    at runCurrentStep (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/deep-research.js:675:15) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+stderr | tests/integration/deep-research-state.test.js > Deep Research state machine > adaptive step expansion > handleStepDone inserts valid adaptive fetch steps 
+
+
+
+[BDS:DEEP_RESEARCH] Step a1 failed: Error: Fetch returned no file 
+
+
+
+    at runCurrentStep (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/deep-research.js:646:15) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+stderr | tests/integration/deep-research-state.test.js > Deep Research state machine > adaptive step expansion > deduplicates adaptive steps proposed in the same nextSteps payload 
+
+
+
+[BDS:DEEP_RESEARCH] Step a1 failed: Error: Search returned no results 
+
+
+
+    at runCurrentStep (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/deep-research.js:675:15) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+stderr | tests/integration/deep-research-state.test.js > Deep Research state machine > adaptive step expansion > caps adaptive steps to 3 per completed step 
+
+
+
+[BDS:DEEP_RESEARCH] Step a1 failed: Error: Search returned no results 
+
+
+
+    at runCurrentStep (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/deep-research.js:675:15) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+stderr | tests/integration/deep-research-state.test.js > Deep Research state machine > adaptive step expansion > caps total managed steps to 12 preventing runaway expansion 
+
+
+
+[BDS:DEEP_RESEARCH] Step a1 failed: Error: Search returned no results 
+
+
+
+    at runCurrentStep (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/deep-research.js:675:15) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+✓ tests/integration/deep-research-state.test.js (50 tests) 87ms 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/CodeRunner.svelte:11:20 This reference only captures the initial value of `content`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1105:0 Unused CSS selector ".bds-message-overlay.rtl pre" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1106:0 Unused CSS selector ".bds-message-overlay.rtl code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1107:0 Unused CSS selector ".bds-message-overlay.rtl .bds-code-block" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1108:0 Unused CSS selector ".bds-message-overlay.rtl table" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1109:0 Unused CSS selector ".bds-message-overlay.rtl th" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1110:0 Unused CSS selector ".bds-message-overlay.rtl td" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1117:0 Unused CSS selector ".bds-message-overlay.rtl ul" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1118:0 Unused CSS selector ".bds-message-overlay.rtl ol" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1123:0 Unused CSS selector ".bds-message-overlay.rtl blockquote" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1131:0 Unused CSS selector ".bds-message-overlay.rtl th:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi))" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/MessageOverlay.svelte:1134:0 Unused CSS selector ".bds-message-overlay.rtl th:not(:is(:lang(ae),:lang(ar),:lang(arc),:lang(bcc),:lang(bqi),:lang(ckb),:lang(dv),:lang(fa),:lang(glk),:lang(he),:lang(ku),:lang(mzn),:lang(nqo),:lang(pnb),:lang(ps),:lang(sd),:lang(ug),:lang(ur),:lang(yi)))" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/VisualizerCard.svelte:174:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/VisualizerCard.svelte:184:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:53 PM [vite-plugin-svelte] src/content/ui/VisualizerCard.svelte:194:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/AutoCodeResultCard.svelte:8:26 This reference only captures the initial value of `status`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:10:24 This reference only captures the initial value of `cleanSrc`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:11:28 This reference only captures the initial value of `cleanSrc`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:32:4 This reference only captures the initial value of `cleanSrc`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:32:27 This reference only captures the initial value of `query`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:128:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:128:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/ImageCard.svelte:176:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:10:52 This reference only captures the initial value of `attrs`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:10:65 This reference only captures the initial value of `attrs`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:691:2 Unused CSS selector ".bds-fallback-hint code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:54 PM [vite-plugin-svelte] src/content/ui/HarnessTaskCard.svelte:824:2 Unused CSS selector ".bds-auto-inject-notice code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:55 PM [vite-plugin-svelte] src/content/commands/CommandsHelp.svelte:38:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > retries no-attachment sends with fallback text when DeepSeek reports over-limit 
+
+
+
+[BDS:AUTO] Failed to send Deep Research inline step result: message is over the composer limit. 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > retries no-attachment sends with emergency text after repeated over-limit reports 
+
+
+
+[BDS:AUTO] Failed to send Deep Research inline step result: message is over the composer limit. 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > retries no-attachment sends with emergency text after repeated over-limit reports 
+
+
+
+[BDS:AUTO] Failed to send Deep Research inline step result retry 1: message is over the composer limit. 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > returns false when all no-attachment over-limit retries are exhausted 
+
+
+
+[BDS:AUTO] Failed to send Deep Research inline step result: message is over the composer limit. 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > returns false when all no-attachment over-limit retries are exhausted 
+
+
+
+[BDS:AUTO] Failed to send Deep Research inline step result retry 1: message is over the composer limit. 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > returns false when all no-attachment over-limit retries are exhausted 
+
+
+
+[BDS:AUTO] Failed to send Deep Research inline step result retry 2: message is over the composer limit. 
+
+
+
+✓ tests/integration/message-processor.test.js (40 tests) 727ms 
+
+
+
+✓ tests/integration/scanner.test.js (34 tests) 2371ms 
+
+
+
+✓ scanner input controls > mounts Deep Research before the attach menu when the composer was already partially mounted  1219ms 
+
+
+
+✓ scanner scheduling > observer-driven append processes only new message plus transitions among 2000  843ms 
+
+
+
+✓ tests/integration/deep-research-context-guard.test.js (40 tests) 412ms 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > creates an error attachment when github fetch fails 
+
+
+
+[BDS:AUTO] GitHub Fetch Failed: Error: boom 
+
+
+
+    at /home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/auto.test.js:708:51 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+    at new Promise (<anonymous>) 
+
+
+
+    at runWithTimeout (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10) 
+
+
+
+    at runTest (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > creates an error attachment when search fails 
+
+
+
+[BDS:AUTO] Search Failed: Error: search error 
+
+
+
+    at /home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/auto.test.js:814:45 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+    at new Promise (<anonymous>) 
+
+
+
+    at runWithTimeout (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10) 
+
+
+
+    at runTest (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > removes dedupe key when global search fails, allowing retry 
+
+
+
+[BDS:AUTO] Search Failed: Error: search error 
+
+
+
+    at /home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/auto.test.js:826:30 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+    at new Promise (<anonymous>) 
+
+
+
+✓ src/content/files/search-reader.test.js (48 tests) 599ms 
+
+
+
+    at runWithTimeout (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10) 
+
+
+
+    at runTest (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+    at runFiles (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3) 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > removes dedupe key when run-scoped search fails, allowing retry 
+
+
+
+[BDS:AUTO] Run-scoped Search Failed: Error: search error 
+
+
+
+    at /home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/auto.test.js:846:30 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+    at file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+    at new Promise (<anonymous>) 
+
+
+
+    at runWithTimeout (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10) 
+
+
+
+    at runTest (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+    at runSuite (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8) 
+
+
+
+    at runFiles (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3) 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > removes global dedupe key when search result injection fails, allowing retry 
+
+
+
+[BDS:AUTO] Failed to send Auto file message: chat input was not found or could not be updated. 
+
+
+
+stderr | tests/integration/auto.test.js > auto integration > removes run-scoped dedupe key when search result injection fails, allowing retry 
+
+
+
+[BDS:AUTO] Failed to send Auto file message: chat input was not found or could not be updated. 
+
+
+
+stderr | tests/integration/auto.test.js > handleAutoMcpCall > injects error message on failed MCP call 
+
+
+
+[BDS:AUTO] MCP Call Failed: Error: Connection refused 
+
+
+
+    at /home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/auto.js:666:23 
+
+
+
+    at Object.<anonymous> (/home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/auto.test.js:956:15) 
+
+
+
+    at Object.mockCall (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/@vitest/spy/dist/index.js:96:15) 
+
+
+
+    at Object.spy [as sendMessage] (file:///home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/tinyspy/dist/index.js:47:80) 
+
+
+
+    at result (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/auto.js:659:22) 
+
+
+
+    at new Promise (<anonymous>) 
+
+
+
+    at task (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/auto.js:658:26) 
+
+
+
+    at processTicksAndRejections (node:internal/process/task_queues:95:5) 
+
+
+
+✓ tests/integration/remote-config.test.js (71 tests) 197ms 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:44:23 This reference only captures the initial value of `nativeInput`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1189:10 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1412:10 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:54:6 `menuRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:73:6 `dialogRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:78:6 `projectBtnRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:79:6 `projectPanelRef` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates 
+
+
+
+https://svelte.dev/e/non_reactive_update 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1819:2 Unused CSS selector ".bds-attach-item--project" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1823:2 Unused CSS selector ".bds-attach-item--project:hover" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1828:2 Unused CSS selector ".bds-picker-row" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1838:2 Unused CSS selector ".bds-picker-row:last-child" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1842:2 Unused CSS selector ".bds-picker-row:hover" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1846:2 Unused CSS selector ".bds-picker-info" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1852:2 Unused CSS selector ".bds-picker-name" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1860:2 Unused CSS selector ".bds-picker-size" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:1888:2 Unused CSS selector ".bds-project-btn--active" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:2095:2 Unused CSS selector ".bds-pp-confirm" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:2102:2 Unused CSS selector ".bds-pp-confirm-text" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+2:20:59 PM [vite-plugin-svelte] src/content/ui/AttachMenu.svelte:2107:2 Unused CSS selector ".bds-pp-confirm-actions" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+✓ tests/integration/auto.test.js (39 tests) 6854ms 
+
+
+
+✓ auto integration > fetches a web page and injects the returned file once  1070ms 
+
+
+
+✓ auto integration > normalizes markdown links before fetching a web page  403ms 
+
+
+
+✓ auto integration > injects pure text and sends it through the chat input  520ms 
+
+
+
+✓ auto integration > uses inline text instead of full file content when no native file input exists  450ms 
+
+
+
+✓ tests/integration/deep-research-runtime.test.js (9 tests) 429ms 
+
+
+
+stderr | tests/integration/ui/AttachMenu.test.js > AttachMenu integration > attaches selected project files and supports voice transcription 
+
+
+
+[BDS] VAD init failed: TypeError: Cannot read properties of undefined (reading 'getUserMedia') 
+
+
+
+    at VADProcessor.start (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/vad-processor.js:34:49) 
+
+
+
+    at startVAD (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/ui/AttachMenu.svelte:346:17) 
+
+
+
+    at HTMLButtonElement.toggleSpeechRecognition (/home/runner/work/Deepseek_Extension/Deepseek_Extension/src/content/ui/AttachMenu.svelte:305:5) 
+
+
+
+    at HTMLDivElement.handle_event_propagation (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/svelte/src/internal/client/dom/elements/events.js:278:16) 
+
+
+
+    at HTMLDivElement.callTheUserObjectsOperation (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/jsdom/lib/jsdom/living/generated/EventListener.js:26:30) 
+
+
+
+    at innerInvokeEventListeners (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25) 
+
+
+
+    at invokeEventListeners (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3) 
+
+
+
+    at HTMLButtonElementImpl._dispatch (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9) 
+
+
+
+    at fireAnEvent (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/jsdom/lib/jsdom/living/helpers/events.js:18:36) 
+
+
+
+    at HTMLButtonElementImpl.click (/home/runner/work/Deepseek_Extension/Deepseek_Extension/node_modules/jsdom/lib/jsdom/living/nodes/HTMLElement-impl.js:85:5) 
+
+
+
+✓ tests/integration/ui/DeepResearch.test.js (23 tests) 354ms 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js (23 tests | 12 failed) 1099ms 
+
+
+
+✓ AttachMenu integration > opens the dropdown and triggers native file upload 85ms 
+
+
+
+✓ AttachMenu integration > keeps multiple enabled for the web Upload File flow 19ms 
+
+
+
+✓ AttachMenu integration > keeps Expert mode controls and plus button visible 44ms 
+
+
+
+✓ AttachMenu integration > uses visionMode visibility flags when Vision mode is selected 47ms 
+
+
+
+✓ AttachMenu integration > keeps the last detected model type when the switcher disappears 80ms 
+
+
+
+× AttachMenu integration > re-detects after the switcher node is replaced 126ms 
+
+
+
+     → expected "spy" to be called with arguments: [ 'files+images', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+✓ AttachMenu integration > fetches a github repo and injects the resulting file 56ms 
+
+
+
+✓ AttachMenu integration > injects repo and commit files when commit history is enabled 47ms 
+
+
+
+✓ AttachMenu integration > keeps the commit input blank while editing and defaults to 100 on fetch 43ms 
+
+
+
+✓ AttachMenu integration > attaches selected project files and supports voice transcription 53ms 
+
+
+
+× AttachMenu integration > attaches native-picked files via the DOM input on Android 33ms 
+
+
+
+     → expected "spy" to be called with arguments: [ 'files', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+× AttachMenu integration > requests files+images mode when model type is vision 66ms 
+
+
+
+     → expected "spy" to be called with arguments: [ 'files+images', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+× AttachMenu integration > injects native-picked images as typed Files on Android 66ms 
+
+
+
+     → expected [] to deeply equal [ [ 'photo.png', 'image/png', 3 ] ] 
+
+
+
+× AttachMenu integration > toasts imagesRequireVision when native skips images outside Vision mode 64ms 
+
+
+
+     → expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+× AttachMenu integration > injects native folder workspace plus separate image attachments in Vision mode 46ms 
+
+
+
+     → Cannot read properties of undefined (reading 'click') 
+
+
+
+× AttachMenu integration > toasts when the native pick returns zero files with skips 34ms 
+
+
+
+     → expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+× AttachMenu integration > toasts a partial-skip summary 34ms 
+
+
+
+     → expected [] to deeply equal [ 'a.md' ] 
+
+
+
+× AttachMenu integration > toasts folderNoTextFiles when a folder pick yields no files 13ms 
+
+
+
+     → Cannot read properties of undefined (reading 'click') 
+
+
+
+× AttachMenu integration > toasts pickTimeout when the picker rejects with picker-timeout 23ms 
+
+
+
+     → expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+✓ AttachMenu integration > stays silent on user cancel 32ms 
+
+
+
+× AttachMenu integration > stale native input resolution (F1) > re-resolves the native input when the mounted input is detached (Android) 39ms 
+
+
+
+     → expected [] to deeply equal [ 'a.md' ] 
+
+
+
+× AttachMenu integration > stale native input resolution (F1) > second consecutive upload lands after DeepSeek swaps the input 32ms 
+
+
+
+     → expected [] to deeply equal [ 'a.md' ] 
+
+
+
+✓ AttachMenu integration > stale native input resolution (F1) > web flow clicks a freshly resolved input when the original is detached 15ms 
+
+
+
+✓ tests/integration/bridge.test.js (24 tests) 72ms 
+
+
+
+(node:3938) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 7) 
+
+
+
+(Use `node --trace-warnings ...` to show where the warning was created) 
+
+
+
+(node:3938) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 9) 
+
+
+
+(node:3938) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 11) 
+
+
+
+(node:3938) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 13) 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js (25 tests | 23 failed) 86ms 
+
+
+
+✓ isNativeFilePickerAvailable > returns false when AndroidBridge is absent 6ms 
+
+
+
+✓ isNativeFilePickerAvailable > returns false when AndroidBridge lacks pickFiles 1ms 
+
+
+
+× isNativeFilePickerAvailable > returns true when AndroidBridge.pickFiles is a function 24ms 
+
+
+
+     → expected false to be true // Object.is equality 
+
+
+
+× nativePickFiles > rejects immediately when bridge is unavailable 5ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > resolves with markdown files on success 2ms 
+
+
+
+     → expected undefined to deeply equal [ { name: 'notes.md', …(1) } ] 
+
+
+
+× nativePickFiles > resolves with cancelled true on user cancellation 1ms 
+
+
+
+     → expected undefined to be true // Object.is equality 
+
+
+
+× nativePickFiles > rejects on non-cancellation errors 1ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > passes folder mode through to the bridge 2ms 
+
+
+
+     → expected "spy" to be called with arguments: [ 'folder', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+× nativePickFiles > resolves a single-chunk v2 payload 1ms 
+
+
+
+     → expected undefined to deeply equal [ { name: 'notes.md', …(1) } ] 
+
+
+
+× nativePickFiles > reassembles multi-chunk payloads in order 3ms 
+
+
+
+     → expected [] to deeply equal { files: [ { …(2) } ], skipped: [] } 
+
+
+
+× nativePickFiles > exposes skipped entries on the result 1ms 
+
+
+
+     → expected undefined to deeply equal [ { name: 'photo.png', …(1) } ] 
+
+
+
+× nativePickFiles > rejects with malformed-payload when reassembled JSON does not parse 1ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > rejects with picker-timeout when no event ever arrives 8ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > status opened clears the launch timer 11ms 
+
+
+
+     → expected true to be false // Object.is equality 
+
+
+
+× nativePickFiles > does not time out while the document is hidden 2ms 
+
+
+
+     → expected true to be false // Object.is equality 
+
+
+
+× nativePickFiles > rejects with picker-timeout 30s after returning visible with no delivery 2ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > protocol events reset the return-grace timer 2ms 
+
+
+
+     → expected true to be false // Object.is equality 
+
+
+
+× nativePickFiles > rejects with read-stalled 120s after reading starts with no chunks 2ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > rejects with picker-timeout at the 10 minute absolute cap 2ms 
+
+
+
+     → promise resolved "[]" instead of rejecting 
+
+
+
+× nativePickFiles > removes the window and visibilitychange listeners after settling 1ms 
+
+
+
+     → expected false to be true // Object.is equality 
+
+
+
+× buildFolderFileFromNative > returns null for empty input 1ms 
+
+
+
+     → expected Promise{…} to be null 
+
+
+
+× buildFolderFileFromNative > builds a concatenated workspace file that includes markdown files 1ms 
+
+
+
+     → expected Promise{…} to be an instance of File 
+
+
+
+× buildFolderFileFromNative > excludes base64 entries from workspace content but keeps them in the tree 2ms 
+
+
+
+     → Failed to execute 'readAsText' on 'FileReader': parameter 1 is not of type 'Blob'. 
+
+
+
+× pickedEntryToFile > builds a typed image File from base64 1ms 
+
+
+
+     → Cannot read properties of null (reading 'name') 
+
+
+
+× pickedEntryToFile > builds a text file when no encoding is present 1ms 
+
+
+
+     → Cannot read properties of null (reading 'name') 
+
+
+
+stderr | tests/integration/background-mcp.test.js > mcpFetch > throws on SSE error event 
+
+
+
+[BDS:MCP] !! tools/call FAILED after 1ms: Error Tool not found 
+
+
+
+stderr | tests/integration/background-mcp.test.js > mcpFetch > throws on JSON-RPC error in JSON response 
+
+
+
+[BDS:MCP] !! bad_method FAILED after 0ms: Error Method not found 
+
+
+
+stderr | tests/integration/background-mcp.test.js > mcpFetch > throws on non-2xx status 
+
+
+
+[BDS:MCP] !! tools/list FAILED after 1ms: Error MCP server returned 500: Internal error 
+
+
+
+[BDS:MCP] !! status=500 
+
+
+
+stderr | tests/integration/background-mcp.test.js > mcpFetch > rejects with timeout error when server does not respond 
+
+
+
+[BDS:MCP] !! ping FAILED after 30100ms: AbortError Aborted 
+
+
+
+stderr | tests/integration/background-mcp.test.js > mcpEnsureInitialized and session lifecycle > clears cache and re-initializes on initialize failure 
+
+
+
+[BDS:MCP] !! initialize FAILED after 0ms: Error Connection refused 
+
+
+
+stderr | tests/integration/background-mcp.test.js > listMcpTools and mcpCallTool - session expiry retry > listMcpTools retries on 404 by re-initializing 
+
+
+
+[BDS:MCP] !! tools/list FAILED after 0ms: Error MCP server returned 404: Session not found 
+
+
+
+[BDS:MCP] !! status=404 
+
+
+
+stderr | tests/integration/background-mcp.test.js > listMcpTools and mcpCallTool - session expiry retry > mcpCallTool retries on 400 by re-initializing 
+
+
+
+[BDS:MCP] !! tools/call FAILED after 0ms: Error MCP server returned 400: Bad session 
+
+
+
+[BDS:MCP] !! status=400 
+
+
+
+stderr | tests/integration/background-mcp.test.js > listMcpTools and mcpCallTool - session expiry retry > does not swallow repeated failures after retry 
+
+
+
+[BDS:MCP] !! tools/list FAILED after 0ms: Error MCP server returned 404: Session expired 
+
+
+
+[BDS:MCP] !! status=404 
+
+
+
+stderr | tests/integration/background-mcp.test.js > listMcpTools and mcpCallTool - session expiry retry > does not swallow repeated failures after retry 
+
+
+
+[BDS:MCP] !! tools/list FAILED after 0ms: Error MCP server returned 404: Still expired 
+
+
+
+[BDS:MCP] !! status=404 
+
+
+
+✓ tests/integration/background-mcp.test.js (20 tests) 51ms 
+
+
+
+✓ tests/integration/load-all-history.test.js (15 tests) 37ms 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:210:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:264:8 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:264:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:274:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:320:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryList.svelte:320:0 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:04 PM [vite-plugin-svelte] src/content/ui/MemoryImport.svelte:80:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+✓ tests/integration/ui/ListComponents.test.js (12 tests) 392ms 
+
+
+
+✓ tests/integration/ui/ImageCard.test.js (16 tests) 159ms 
+
+
+
+✓ src/lib/local-directory-source.test.js (12 tests) 67ms 
+
+
+
+✓ tests/integration/ui/SidebarMenuInjector.test.js (17 tests) 3812ms 
+
+
+
+✓ SidebarMenuInjector > URL capture via href-based mousedown listener > captures URL when mousedown fires on the chat link element itself  342ms 
+
+
+
+✓ SidebarMenuInjector > URL capture via href-based mousedown listener > captures URL when mousedown fires on sibling button (button outside <a>, real Chrome/Firefox layout)  310ms 
+
+
+
+✓ SidebarMenuInjector > menu injection via MutationObserver > does not inject BDS options twice into the same menu  373ms 
+
+
+
+❯ tests/integration/ui/ProjectsManager.test.js (8 tests | 4 failed) 393ms 
+
+
+
+✓ ProjectsManager integration > creates a new project from the list view 91ms 
+
+
+
+✓ ProjectsManager integration > updates project details after entering the detail view 50ms 
+
+
+
+✓ ProjectsManager integration > uploads files and deletes a project 76ms 
+
+
+
+✓ ProjectsManager integration > keeps multiple enabled for the project Upload File flow 30ms 
+
+
+
+× ProjectsManager integration > toasts when a native project file pick returns zero files 59ms 
+
+
+
+     → expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+× ProjectsManager integration > toasts a partial-skip summary for project file picks 39ms 
+
+
+
+     → expected "spy" to be called once, but got 0 times 
+
+
+
+× ProjectsManager integration > surfaces folderNoTextFiles in fileError when a project folder pick yields nothing 21ms 
+
+
+
+     → Cannot read properties of undefined (reading 'click') 
+
+
+
+× ProjectsManager integration > maps picker-timeout to the localized message 23ms 
+
+
+
+     → expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:489:35 This reference only captures the initial value of `activeProject`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1275:2 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1322:6 Non-interactive element `<label>` cannot have interactive role 'button' 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_to_interactive_role 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1322:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1338:8 Non-interactive element `<label>` cannot have interactive role 'button' 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_to_interactive_role 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1338:8 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1379:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1385:12 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1395:14 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:1414:12 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2083:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2083:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2084:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2084:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2115:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2130:12 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2147:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2147:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2148:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2148:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2170:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2170:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2171:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2171:4 Non-interactive element `<div>` should not be assigned mouse or keyboard event listeners 
+
+
+
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2203:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2207:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2211:10 A form label must be associated with a control 
+
+
+
+https://svelte.dev/e/a11y_label_has_associated_control 
+
+
+
+2:21:07 PM [vite-plugin-svelte] src/content/ui/SettingsPanel.svelte:2383:2 Unused CSS selector ".bds-token-help code" 
+
+
+
+https://svelte.dev/e/css_unused_selector 
+
+
+
+✓ tests/integration/ui/DeepCodeCards.test.js (8 tests) 294ms 
+
+
+
+✓ tests/integration/table-injector.test.js (14 tests) 123ms 
+
+
+
+2:21:08 PM [vite-plugin-svelte] src/content/ui/QuestionPanel.svelte:521:12 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+✓ tests/integration/ui/SettingsPanel.test.js (7 tests) 788ms 
+
+
+
+✓ SettingsPanel integration > adds a custom system prompt and saves settings to chrome storage  315ms 
+
+
+
+✓ tests/integration/ui/QuestionPanel.test.js (6 tests) 214ms 
+
+
+
+✓ tests/integration/host.test.js (14 tests) 47ms 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+stderr | tests/integration/commands.test.js > context-handoff > checkPendingHandoff reads modelType from stored handoff 
+
+
+
+[BDS:Handoff] setDeepSeekModel - radiogroup not found 
+
+
+
+✓ tests/integration/commands.test.js (14 tests) 677ms 
+
+
+
+✓ tryExecuteRawInput > returns false for non-command input  547ms 
+
+
+
+✓ tests/integration/ui/SimpleCards.test.js (8 tests) 201ms 
+
+
+
+✓ src/content/deep-code.test.js (14 tests) 49ms 
+
+
+
+✓ tests/integration/ui/MessageOverlay.test.js (6 tests) 233ms 
+
+
+
+✓ tests/integration/commands/Autocomplete.test.js (12 tests) 220ms 
+
+
+
+✓ tests/integration/theme.test.js (12 tests) 160ms 
+
+
+
+✓ src/lib/rag-engine.test.js (8 tests) 21ms 
+
+
+
+✓ tests/integration/deep-research-auto.test.js (7 tests) 995ms 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SavedItems.svelte:255:16 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SavedItems.svelte:255:16 `<span>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:8:21 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:8:28 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:9:23 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:9:30 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:11:31 This reference only captures the initial value of `item`. Did you mean to reference it inside a derived instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:39:0 `<div>` with a keydown handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:14 PM [vite-plugin-svelte] src/content/ui/SnippetDialog.svelte:57:8 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+✓ tests/integration/ui/SavedItems.test.js (7 tests) 253ms 
+
+
+
+✓ tests/integration/file-emission.test.js (7 tests) 30ms 
+
+
+
+✓ src/content/tools/exporter.test.js (6 tests) 591ms 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/WhatsNewModal.svelte:74:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+✓ tests/integration/ui/SnippetDialog.test.js (6 tests) 123ms 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:44:27 This reference only captures the initial value of `content`. Did you mean to reference it inside a closure instead? 
+
+
+
+https://svelte.dev/e/state_referenced_locally 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:231:12 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:241:12 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/PreviewPanel.svelte:251:12 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/ConfirmDialog.svelte:8:2 Elements with the 'dialog' interactive role must have a tabindex value 
+
+
+
+https://svelte.dev/e/a11y_interactive_supports_focus 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/ConfirmDialog.svelte:9:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/ui/ConfirmDialog.svelte:9:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:87:0 `<div>` with a keydown handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:143:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:143:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:144:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:144:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:179:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:179:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:180:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:180:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:198:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:198:4 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:199:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:199:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:16 PM [vite-plugin-svelte] src/content/api-playground/ApiPlayground.svelte:211:14 Avoid using autofocus 
+
+
+
+https://svelte.dev/e/a11y_autofocus 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:227:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:227:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:252:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:252:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:311:8 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:311:8 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:351:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate 
+
+
+
+https://svelte.dev/e/a11y_click_events_have_key_events 
+
+
+
+2:21:17 PM [vite-plugin-svelte] src/content/api-playground/ApiRequestBuilder.svelte:351:6 `<div>` with a click handler must have an ARIA role 
+
+
+
+https://svelte.dev/e/a11y_no_static_element_interactions 
+
+
+
+✓ src/content/parser/mcp-parser.test.js (11 tests) 35ms 
+
+
+
+✓ tests/integration/ui/App.test.js (6 tests) 1032ms 
+
+
+
+✓ App toggle button > renders #bds-toggle with aria-label  406ms 
+
+
+
+✓ tests/integration/auto-code-runner.test.js (3 tests) 94ms 
+
+
+
+✓ tests/integration/github-reader.test.js (6 tests) 83ms 
+
+
+
+stderr | tests/integration/deep-research-payload.test.js > Deep Research payload mutation > injects one-shot planning instructions into the outbound user prompt 
+
+
+
+[BDS] Guard check: model="" payload.model=undefined source=payload type=instant limit=163840 msgLen=1393 limits=undefined 
+
+
+
+stderr | tests/integration/deep-research-payload.test.js > Deep Research payload mutation > does not inject planning instructions after the run config is consumed 
+
+
+
+[BDS] Guard check: model="" payload.model=undefined source=payload type=instant limit=163840 msgLen=1329 limits=undefined 
+
+
+
+[BDS] Guard check: model="" payload.model=undefined source=payload type=instant limit=163840 msgLen=98 limits=undefined 
+
+
+
+stderr | tests/integration/deep-research-payload.test.js > Deep Research payload mutation > preserves approved plan control messages instead of stripping them to empty 
+
+
+
+[BDS] Guard check: model="" payload.model=undefined source=payload type=instant limit=163840 msgLen=250 limits=undefined 
+
+
+
+stderr | tests/integration/deep-research-payload.test.js > Deep Research payload mutation > preserves revision control messages instead of stripping them to empty 
+
+
+
+[BDS] Guard check (prompt): model="" payload.model=undefined source=payload type=instant limit=163840 msgLen=215 limits=undefined 
+
+
+
+✓ tests/integration/deep-research-payload.test.js (4 tests) 70ms 
+
+
+
+✓ tests/integration/files/folder-reader.test.js (3 tests) 52ms 
+
+
+
+✓ src/lib/utils/download.test.js (6 tests) 80ms 
+
+
+
+✓ tests/integration/ui/DeepCodeToggle.test.js (3 tests) 200ms 
+
+
+
+✓ tests/integration/code-block-injectors.test.js (6 tests) 158ms 
+
+
+
+✓ src/content/tags/tag-hider.test.js (5 tests) 58ms 
+
+
+
+✓ tests/integration/github-commits.test.js (3 tests) 28ms 
+
+
+
+stderr | tests/integration/deep-code-payload.test.js > DeepCode payload mutation > injects the file tree into the outbound user prompt via mutatePayload 
+
+
+
+[BDS] Guard check: model="" payload.model=undefined source=payload type=instant limit=163840 msgLen=9835 limits=undefined 
+
+
+
+✓ tests/integration/deep-code-payload.test.js (4 tests) 53ms 
+
+
+
+✓ src/content/dom/message-text.test.js (6 tests) 47ms 
+
+
+
+✓ tests/integration/ui/DirListResultCard.test.js (4 tests) 102ms 
+
+
+
+✓ tests/integration/ui/CodeRunner.test.js (3 tests) 151ms 
+
+
+
+✓ tests/integration/ui/SearchResultCard.test.js (1 test) 175ms 
+
+
+
+✓ tests/integration/files/native-file-input.test.js (3 tests) 15ms 
+
+
+
+✓ src/content/files/project-file-builder.test.js (2 tests) 36ms 
+
+
+
+✓ src/content/parser/character-parser.test.js (2 tests) 14ms 
+
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯ 
+
+
+
+ FAIL  tests/integration/hide-drawer-app-item.test.js [ tests/integration/hide-drawer-app-item.test.js ] 
+
+
+
+Error: Failed to resolve import "../../src/android/hide-drawer-app-item.js" from "tests/integration/hide-drawer-app-item.test.js". Does the file exist? 
+
+
+
+  Plugin: vite:import-analysis 
+
+
+
+  File: /home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/hide-drawer-app-item.test.js:7:9 
+
+
+
+  5  |    DRAWER_APP_ITEM_TEXT, 
+
+
+
+  6  |    hideDrawerAppItem, 
+
+
+
+  7  |  } from "../../src/android/hide-drawer-app-item.js"; 
+
+
+
+     |          ^ 
+
+
+
+  8  |   
+
+
+
+  9  |  /** Creates a .ds-dropdown-menu matching DeepSeek's real DOM structure. */ 
+
+
+
+❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42553:41 
+
+
+
+❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42550:16 
+
+
+
+❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40529:23 
+
+
+
+❯ node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40648:37 
+
+
+
+❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40575:7 
+
+
+
+❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42348:18 
+
+
+
+❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:35740:27 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/41]⎯ 
+
+
+
+ FAIL  tests/integration/hide-get-app.test.js [ tests/integration/hide-get-app.test.js ] 
+
+
+
+Error: Failed to resolve import "../../src/android/hide-get-app.js" from "tests/integration/hide-get-app.test.js". Does the file exist? 
+
+
+
+  Plugin: vite:import-analysis 
+
+
+
+  File: /home/runner/work/Deepseek_Extension/Deepseek_Extension/tests/integration/hide-get-app.test.js:4:35 
+
+
+
+  2  |   
+
+
+
+  3  |  import { afterEach, beforeEach, describe, expect, it } from "vitest"; 
+
+
+
+  4  |  import { hideGetAppButton } from "../../src/android/hide-get-app.js"; 
+
+
+
+     |                                    ^ 
+
+
+
+  5  |   
+
+
+
+  6  |  function makeGetAppButton() { 
+
+
+
+❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42553:41 
+
+
+
+❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42550:16 
+
+
+
+❯ normalizeUrl node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40529:23 
+
+
+
+❯ node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40648:37 
+
+
+
+❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40575:7 
+
+
+
+❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42348:18 
+
+
+
+❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:35740:27 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/41]⎯ 
+
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 39 ⎯⎯⎯⎯⎯⎯⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > isNativeFilePickerAvailable > returns true when AndroidBridge.pickFiles is a function 
+
+
+
+AssertionError: expected false to be true // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- true 
+
+
+
++ false 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:50:43 
+
+
+
+ 48|   it("returns true when AndroidBridge.pickFiles is a function", () => { 
+
+
+
+ 49|     window.AndroidBridge = { pickFiles: vi.fn() }; 
+
+
+
+ 50|     expect(isNativeFilePickerAvailable()).toBe(true); 
+
+
+
+   |                                           ^ 
+
+
+
+ 51|   }); 
+
+
+
+ 52| }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects immediately when bridge is unavailable 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:73:43 
+
+
+
+ 71|  
+
+
+
+ 72|   it("rejects immediately when bridge is unavailable", async () => { 
+
+
+
+ 73|     await expect(nativePickFiles("files")).rejects.toThrow( 
+
+
+
+   |                                           ^ 
+
+
+
+ 74|       "AndroidBridge.pickFiles not available", 
+
+
+
+ 75|     ); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > resolves with markdown files on success 
+
+
+
+AssertionError: expected undefined to deeply equal [ { name: 'notes.md', …(1) } ] 
+
+
+
+- Expected:  
+
+
+
+[ 
+
+
+
+  { 
+
+
+
+    "content": "# Notes", 
+
+
+
+    "name": "notes.md", 
+
+
+
+  }, 
+
+
+
+] 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:86:26 
+
+
+
+ 84|     const result = await nativePickFiles("files"); 
+
+
+
+ 85|  
+
+
+
+ 86|     expect(result.files).toEqual([{ name: "notes.md", content: "# Note… 
+
+
+
+   |                          ^ 
+
+
+
+ 87|   }); 
+
+
+
+ 88|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > resolves with cancelled true on user cancellation 
+
+
+
+AssertionError: expected undefined to be true // Object.is equality 
+
+
+
+- Expected:  
+
+
+
+true 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:94:30 
+
+
+
+ 92|     const result = await nativePickFiles("files"); 
+
+
+
+ 93|  
+
+
+
+ 94|     expect(result.cancelled).toBe(true); 
+
+
+
+   |                              ^ 
+
+
+
+ 95|     expect(result.files).toHaveLength(0); 
+
+
+
+ 96|   }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects on non-cancellation errors 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:101:43 
+
+
+
+ 99|     installBridgeMock(() => ({ error: "permission denied", files: [] }… 
+
+
+
+100|  
+
+
+
+101|     await expect(nativePickFiles("files")).rejects.toThrow("permission… 
+
+
+
+   |                                           ^ 
+
+
+
+102|   }); 
+
+
+
+103|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > passes folder mode through to the bridge 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ 'folder', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:113:44 
+
+
+
+111|     const result = await nativePickFiles("folder"); 
+
+
+
+112|  
+
+
+
+113|     expect(window.AndroidBridge.pickFiles).toHaveBeenCalledWith( 
+
+
+
+   |                                            ^ 
+
+
+
+114|       "folder", 
+
+
+
+115|       expect.any(String), 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > resolves a single-chunk v2 payload 
+
+
+
+AssertionError: expected undefined to deeply equal [ { name: 'notes.md', …(1) } ] 
+
+
+
+- Expected:  
+
+
+
+[ 
+
+
+
+  { 
+
+
+
+    "content": "# Notes", 
+
+
+
+    "name": "notes.md", 
+
+
+
+  }, 
+
+
+
+] 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:128:26 
+
+
+
+126|     const result = await nativePickFiles("files"); 
+
+
+
+127|  
+
+
+
+128|     expect(result.files).toEqual([{ name: "notes.md", content: "# Note… 
+
+
+
+   |                          ^ 
+
+
+
+129|     expect(result.skipped).toEqual([]); 
+
+
+
+130|   }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > reassembles multi-chunk payloads in order 
+
+
+
+AssertionError: expected [] to deeply equal { files: [ { …(2) } ], skipped: [] } 
+
+
+
+- Expected:  
+
+
+
+{ 
+
+
+
+  "files": [ 
+
+
+
+    { 
+
+
+
+      "content": "# Notes 
+
+
+
+xxxxxxxxxxxxxxxxxxxx", 
+
+
+
+      "name": "notes.md", 
+
+
+
+    }, 
+
+
+
+  ], 
+
+
+
+  "skipped": [], 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > exposes skipped entries on the result 
+
+
+
+AssertionError: expected undefined to deeply equal [ { name: 'photo.png', …(1) } ] 
+
+
+
+- Expected:  
+
+
+
+[ 
+
+
+
+  { 
+
+
+
+    "name": "photo.png", 
+
+
+
+    "reason": "unsupported-type", 
+
+
+
+  }, 
+
+
+
+] 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:190:28 
+
+
+
+188|     const result = await nativePickFiles("files"); 
+
+
+
+189|  
+
+
+
+190|     expect(result.skipped).toEqual(skipped); 
+
+
+
+   |                            ^ 
+
+
+
+191|   }); 
+
+
+
+192|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects with malformed-payload when reassembled JSON does not parse 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:206:43 
+
+
+
+204|     }; 
+
+
+
+205|  
+
+
+
+206|     await expect(nativePickFiles("files")).rejects.toThrow(PICK_ERRORS… 
+
+
+
+   |                                           ^ 
+
+
+
+207|   }); 
+
+
+
+208|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects with picker-timeout when no event ever arrives 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:214:40 
+
+
+
+212|  
+
+
+
+213|     const promise = nativePickFiles("files"); 
+
+
+
+214|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.TI… 
+
+
+
+   |                                        ^ 
+
+
+
+215|     await vi.advanceTimersByTimeAsync(10000); 
+
+
+
+216|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > status opened clears the launch timer 
+
+
+
+AssertionError: expected true to be false // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- false 
+
+
+
++ true 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:242:21 
+
+
+
+240|     await vi.advanceTimersByTimeAsync(10000); 
+
+
+
+241|  
+
+
+
+242|     expect(settled).toBe(false); 
+
+
+
+   |                     ^ 
+
+
+
+243|     dispatchPickResult(capturedRequestId, { files: [], skipped: [] }); 
+
+
+
+244|     await expect(promise).resolves.toEqual({ files: [], skipped: [] }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > does not time out while the document is hidden 
+
+
+
+AssertionError: expected true to be false // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- false 
+
+
+
++ true 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:270:21 
+
+
+
+268|     await vi.advanceTimersByTimeAsync(9 * 60 * 1000); 
+
+
+
+269|  
+
+
+
+270|     expect(settled).toBe(false); 
+
+
+
+   |                     ^ 
+
+
+
+271|     dispatchPickResult(capturedRequestId, { files: [], skipped: [] }); 
+
+
+
+272|     await expect(promise).resolves.toEqual({ files: [], skipped: [] }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects with picker-timeout 30s after returning visible with no delivery 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:288:40 
+
+
+
+286|     setVisibilityState("hidden"); 
+
+
+
+287|     setVisibilityState("visible"); 
+
+
+
+288|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.TI… 
+
+
+
+   |                                        ^ 
+
+
+
+289|     await vi.advanceTimersByTimeAsync(30000); 
+
+
+
+290|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > protocol events reset the return-grace timer 
+
+
+
+AssertionError: expected true to be false // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- false 
+
+
+
++ true 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:320:21 
+
+
+
+318|     await vi.advanceTimersByTimeAsync(20000); 
+
+
+
+319|  
+
+
+
+320|     expect(settled).toBe(false); 
+
+
+
+   |                     ^ 
+
+
+
+321|     dispatchPickResult(capturedRequestId, { files: [], skipped: [] }); 
+
+
+
+322|     await expect(promise).resolves.toEqual({ files: [], skipped: [] }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects with read-stalled 120s after reading starts with no chunks 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:337:40 
+
+
+
+335|     dispatchPickStatus(capturedRequestId, "opened"); 
+
+
+
+336|     dispatchPickStatus(capturedRequestId, "reading"); 
+
+
+
+337|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.ST… 
+
+
+
+   |                                        ^ 
+
+
+
+338|     await vi.advanceTimersByTimeAsync(120000); 
+
+
+
+339|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > rejects with picker-timeout at the 10 minute absolute cap 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:354:40 
+
+
+
+352|  
+
+
+
+353|     dispatchPickStatus(capturedRequestId, "opened"); 
+
+
+
+354|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.TI… 
+
+
+
+   |                                        ^ 
+
+
+
+355|     await vi.advanceTimersByTimeAsync(10 * 60 * 1000); 
+
+
+
+356|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > nativePickFiles > removes the window and visibilitychange listeners after settling 
+
+
+
+AssertionError: expected false to be true // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- true 
+
+
+
++ false 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:371:7 
+
+
+
+369|         String(eventName).startsWith("__bds_native_files_picked_"), 
+
+
+
+370|       ), 
+
+
+
+371|     ).toBe(true); 
+
+
+
+   |       ^ 
+
+
+
+372|     expect( 
+
+
+
+373|       documentRemoveSpy.mock.calls.some(([eventName]) => eventName ===… 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > buildFolderFileFromNative > returns null for empty input 
+
+
+
+AssertionError: expected Promise{…} to be null 
+
+
+
+- Expected:  
+
+
+
+null 
+
+
+
++ Received:  
+
+
+
+Promise {} 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:388:51 
+
+
+
+386| describe("buildFolderFileFromNative", () => { 
+
+
+
+387|   it("returns null for empty input", () => { 
+
+
+
+388|     expect(buildFolderFileFromNative([], "repo")).toBeNull(); 
+
+
+
+   |                                                   ^ 
+
+
+
+389|     expect(buildFolderFileFromNative(null, "repo")).toBeNull(); 
+
+
+
+390|   }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > buildFolderFileFromNative > builds a concatenated workspace file that includes markdown files 
+
+
+
+AssertionError: expected Promise{…} to be an instance of File 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:401:18 
+
+
+
+399|     ); 
+
+
+
+400|  
+
+
+
+401|     expect(file).toBeInstanceOf(File); 
+
+
+
+   |                  ^ 
+
+
+
+402|     expect(file.name).toBe("repo_workspace.txt"); 
+
+
+
+403|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > buildFolderFileFromNative > excludes base64 entries from workspace content but keeps them in the tree 
+
+
+
+TypeError: Failed to execute 'readAsText' on 'FileReader': parameter 1 is not of type 'Blob'. 
+
+
+
+❯ Object.exports.convert node_modules/jsdom/lib/jsdom/living/generated/Blob.js:22:9 
+
+
+
+❯ FileReader.readAsText node_modules/jsdom/lib/jsdom/living/generated/FileReader.js:163:23 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:21:12 
+
+
+
+ 19|     reader.onload = () => resolve(reader.result); 
+
+
+
+ 20|     reader.onerror = () => reject(reader.error); 
+
+
+
+ 21|     reader.readAsText(blob); 
+
+
+
+   |            ^ 
+
+
+
+ 22|   }); 
+
+
+
+ 23| } 
+
+
+
+❯ readBlobText tests/integration/platform/android-file-picker.test.js:17:10 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:420:24 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > pickedEntryToFile > builds a typed image File from base64 
+
+
+
+TypeError: Cannot read properties of null (reading 'name') 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:438:17 
+
+
+
+436|     }); 
+
+
+
+437|  
+
+
+
+438|     expect(file.name).toBe("photo.png"); 
+
+
+
+   |                 ^ 
+
+
+
+439|     expect(file.type).toBe("image/png"); 
+
+
+
+440|     expect(file.size).toBe(3); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/41]⎯ 
+
+
+
+ FAIL  tests/integration/platform/android-file-picker.test.js > pickedEntryToFile > builds a text file when no encoding is present 
+
+
+
+TypeError: Cannot read properties of null (reading 'name') 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:447:17 
+
+
+
+445|     const file = pickedEntryToFile({ name: "notes.md", content: "# Not… 
+
+
+
+446|  
+
+
+
+447|     expect(file.name).toBe("notes.md"); 
+
+
+
+   |                 ^ 
+
+
+
+448|     expect(file.type).toBe("text/plain"); 
+
+
+
+449|     expect(await readBlobText(file)).toBe("# Notes"); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > re-detects after the switcher node is replaced 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ 'files+images', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:273:44 
+
+
+
+271|     await flushNativePick(); 
+
+
+
+272|  
+
+
+
+273|     expect(window.AndroidBridge.pickFiles).toHaveBeenCalledWith("files… 
+
+
+
+   |                                            ^ 
+
+
+
+274|     cleanup(); 
+
+
+
+275|   }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > attaches native-picked files via the DOM input on Android 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ 'files', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:463:44 
+
+
+
+461|     await flushNativePick(); 
+
+
+
+462|  
+
+
+
+463|     expect(window.AndroidBridge.pickFiles).toHaveBeenCalledWith("files… 
+
+
+
+   |                                            ^ 
+
+
+
+464|     expect(Array.from(nativeInput.files, (file) => file.name)).toEqual… 
+
+
+
+465|     expect(changeHandler).toHaveBeenCalled(); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > requests files+images mode when model type is vision 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ 'files+images', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:485:44 
+
+
+
+483|     await flushNativePick(); 
+
+
+
+484|  
+
+
+
+485|     expect(window.AndroidBridge.pickFiles).toHaveBeenCalledWith("files… 
+
+
+
+   |                                            ^ 
+
+
+
+486|     cleanup(); 
+
+
+
+487|   }); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > injects native-picked images as typed Files on Android 
+
+
+
+AssertionError: expected [] to deeply equal [ [ 'photo.png', 'image/png', 3 ] ] 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- [ 
+
+
+
+-   [ 
+
+
+
+-     "photo.png", 
+
+
+
+-     "image/png", 
+
+
+
+-     3, 
+
+
+
+-   ], 
+
+
+
+- ] 
+
+
+
++ [] 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:504:88 
+
+
+
+502|     await flushNativePick(); 
+
+
+
+503|  
+
+
+
+504|     expect(Array.from(nativeInput.files, (file) => [file.name, file.ty… 
+
+
+
+   |                                                                                        ^ 
+
+
+
+505|       ["photo.png", "image/png", 3], 
+
+
+
+506|     ]); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > toasts imagesRequireVision when native skips images outside Vision mode 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:525:32 
+
+
+
+523|     await flushNativePick(); 
+
+
+
+524|  
+
+
+
+525|     expect(state.ui.showToast).toHaveBeenCalledWith( 
+
+
+
+   |                                ^ 
+
+
+
+526|       "Images can only be attached in Vision mode.", 
+
+
+
+527|     ); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > injects native folder workspace plus separate image attachments in Vision mode 
+
+
+
+TypeError: Cannot read properties of undefined (reading 'click') 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:547:41 
+
+
+
+545|     target.querySelector(".bds-plus-btn").click(); 
+
+
+
+546|     await flushUi(); 
+
+
+
+547|     getAttachItemByText("Upload Folder").click(); 
+
+
+
+   |                                         ^ 
+
+
+
+548|     await flushNativePick(); 
+
+
+
+549|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > toasts when the native pick returns zero files with skips 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:572:32 
+
+
+
+570|  
+
+
+
+571|     expect(nativeInput.files).toHaveLength(0); 
+
+
+
+572|     expect(state.ui.showToast).toHaveBeenCalledWith( 
+
+
+
+   |                                ^ 
+
+
+
+573|       "Nothing was attached - the selected file(s) are unsupported, to… 
+
+
+
+574|     ); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > toasts a partial-skip summary 
+
+
+
+AssertionError: expected [] to deeply equal [ 'a.md' ] 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- [ 
+
+
+
+-   "a.md", 
+
+
+
+- ] 
+
+
+
++ [] 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:591:64 
+
+
+
+589|     await flushNativePick(); 
+
+
+
+590|  
+
+
+
+591|     expect(Array.from(nativeInput.files, (file) => file.name)).toEqual… 
+
+
+
+   |                                                                ^ 
+
+
+
+592|     expect(state.ui.showToast).toHaveBeenCalledOnce(); 
+
+
+
+593|     expect(state.ui.showToast.mock.calls[0][0]).toContain("1"); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > toasts folderNoTextFiles when a folder pick yields no files 
+
+
+
+TypeError: Cannot read properties of undefined (reading 'click') 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:609:41 
+
+
+
+607|     target.querySelector(".bds-plus-btn").click(); 
+
+
+
+608|     await flushUi(); 
+
+
+
+609|     getAttachItemByText("Upload Folder").click(); 
+
+
+
+   |                                         ^ 
+
+
+
+610|     await flushNativePick(); 
+
+
+
+611|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > toasts pickTimeout when the picker rejects with picker-timeout 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:631:32 
+
+
+
+629|     await flushUi(); 
+
+
+
+630|  
+
+
+
+631|     expect(state.ui.showToast).toHaveBeenCalledWith( 
+
+
+
+   |                                ^ 
+
+
+
+632|       "The file picker did not return a result. Please try again.", 
+
+
+
+633|     ); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > stale native input resolution (F1) > re-resolves the native input when the mounted input is detached (Android) 
+
+
+
+AssertionError: expected [] to deeply equal [ 'a.md' ] 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- [ 
+
+
+
+-   "a.md", 
+
+
+
+- ] 
+
+
+
++ [] 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:669:61 
+
+
+
+667|       await flushNativePick(); 
+
+
+
+668|  
+
+
+
+669|       expect(Array.from(inputB.files, (file) => file.name)).toEqual(["… 
+
+
+
+   |                                                             ^ 
+
+
+
+670|       expect(inputA.files).toHaveLength(0); 
+
+
+
+671|       cleanup(); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/AttachMenu.test.js > AttachMenu integration > stale native input resolution (F1) > second consecutive upload lands after DeepSeek swaps the input 
+
+
+
+AssertionError: expected [] to deeply equal [ 'a.md' ] 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- [ 
+
+
+
+-   "a.md", 
+
+
+
+- ] 
+
+
+
++ [] 
+
+
+
+❯ tests/integration/ui/AttachMenu.test.js:686:61 
+
+
+
+684|       getAttachItemByText("Upload File").click(); 
+
+
+
+685|       await flushNativePick(); 
+
+
+
+686|       expect(Array.from(inputA.files, (file) => file.name)).toEqual(["… 
+
+
+
+   |                                                             ^ 
+
+
+
+687|  
+
+
+
+688|       inputA.remove(); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/ProjectsManager.test.js > ProjectsManager integration > toasts when a native project file pick returns zero files 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/ProjectsManager.test.js:201:32 
+
+
+
+199|     await flushNativePick(); 
+
+
+
+200|  
+
+
+
+201|     expect(state.ui.showToast).toHaveBeenCalledWith( 
+
+
+
+   |                                ^ 
+
+
+
+202|       "Nothing was attached - the selected file(s) are unsupported, to… 
+
+
+
+203|     ); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/ProjectsManager.test.js > ProjectsManager integration > toasts a partial-skip summary for project file picks 
+
+
+
+AssertionError: expected "spy" to be called once, but got 0 times 
+
+
+
+❯ tests/integration/ui/ProjectsManager.test.js:225:32 
+
+
+
+223|     await flushNativePick(); 
+
+
+
+224|  
+
+
+
+225|     expect(state.ui.showToast).toHaveBeenCalledOnce(); 
+
+
+
+   |                                ^ 
+
+
+
+226|     expect(state.ui.showToast.mock.calls[0][0]).toContain("1"); 
+
+
+
+227|     expect(state.ui.showToast.mock.calls[0][0]).toContain("2"); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/ProjectsManager.test.js > ProjectsManager integration > surfaces folderNoTextFiles in fileError when a project folder pick yields nothing 
+
+
+
+TypeError: Cannot read properties of undefined (reading 'click') 
+
+
+
+❯ tests/integration/ui/ProjectsManager.test.js:241:45 
+
+
+
+239|     await openProjectDetail(target); 
+
+
+
+240|  
+
+
+
+241|     getButtonByText(target, "Upload Folder").click(); 
+
+
+
+   |                                             ^ 
+
+
+
+242|     await flushNativePick(); 
+
+
+
+243|  
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/41]⎯ 
+
+
+
+ FAIL  tests/integration/ui/ProjectsManager.test.js > ProjectsManager integration > maps picker-timeout to the localized message 
+
+
+
+AssertionError: expected "spy" to be called with arguments: [ Array(1) ] 
+
+
+
+Number of calls: 0 
+
+
+
+❯ tests/integration/ui/ProjectsManager.test.js:262:32 
+
+
+
+260|     await flushUi(); 
+
+
+
+261|  
+
+
+
+262|     expect(state.ui.showToast).toHaveBeenCalledWith( 
+
+
+
+   |                                ^ 
+
+
+
+263|       "The file picker did not return a result. Please try again.", 
+
+
+
+264|     ); 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/41]⎯ 
+
+
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯ 
+
+
+
+Vitest caught 7 unhandled errors during the test run. 
+
+
+
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:214:40 
+
+
+
+212|  
+
+
+
+213|     const promise = nativePickFiles("files"); 
+
+
+
+214|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.TI… 
+
+
+
+   |                                        ^ 
+
+
+
+215|     await vi.advanceTimersByTimeAsync(10000); 
+
+
+
+216|  
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with picker-timeout when no event ever arrives". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:288:40 
+
+
+
+286|     setVisibilityState("hidden"); 
+
+
+
+287|     setVisibilityState("visible"); 
+
+
+
+288|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.TI… 
+
+
+
+   |                                        ^ 
+
+
+
+289|     await vi.advanceTimersByTimeAsync(30000); 
+
+
+
+290|  
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with picker-timeout 30s after returning visible with no delivery". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:337:40 
+
+
+
+335|     dispatchPickStatus(capturedRequestId, "opened"); 
+
+
+
+336|     dispatchPickStatus(capturedRequestId, "reading"); 
+
+
+
+337|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.ST… 
+
+
+
+   |                                        ^ 
+
+
+
+338|     await vi.advanceTimersByTimeAsync(120000); 
+
+
+
+339|  
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with read-stalled 120s after reading starts with no chunks". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:354:40 
+
+
+
+352|  
+
+
+
+353|     dispatchPickStatus(capturedRequestId, "opened"); 
+
+
+
+354|     const expectation = expect(promise).rejects.toThrow(PICK_ERRORS.TI… 
+
+
+
+   |                                        ^ 
+
+
+
+355|     await vi.advanceTimersByTimeAsync(10 * 60 * 1000); 
+
+
+
+356|  
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with picker-timeout at the 10 minute absolute cap". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+Error: native-file-picker-unavailable 
+
+
+
+❯ buildFolderFileFromNative src/platform/native-file-picker.js:30:9 
+
+
+
+ 28|  
+
+
+
+ 29| export async function buildFolderFileFromNative() { 
+
+
+
+ 30|   throw new Error(PICK_ERRORS.UNAVAILABLE); 
+
+
+
+   |         ^ 
+
+
+
+ 31| } 
+
+
+
+ 32|  
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:388:37 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+❯ runTest node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12 
+
+
+
+❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+Error: native-file-picker-unavailable 
+
+
+
+❯ buildFolderFileFromNative src/platform/native-file-picker.js:30:9 
+
+
+
+ 28|  
+
+
+
+ 29| export async function buildFolderFileFromNative() { 
+
+
+
+ 30|   throw new Error(PICK_ERRORS.UNAVAILABLE); 
+
+
+
+   |         ^ 
+
+
+
+ 31| } 
+
+
+
+ 32|  
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:393:43 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+❯ runTest node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12 
+
+
+
+❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯ 
+
+
+
+Error: native-file-picker-unavailable 
+
+
+
+❯ buildFolderFileFromNative src/platform/native-file-picker.js:30:9 
+
+
+
+ 28|  
+
+
+
+ 29| export async function buildFolderFileFromNative() { 
+
+
+
+ 30|   throw new Error(PICK_ERRORS.UNAVAILABLE); 
+
+
+
+   |         ^ 
+
+
+
+ 31| } 
+
+
+
+ 32|  
+
+
+
+❯ tests/integration/platform/android-file-picker.test.js:412:43 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+❯ runTest node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12 
+
+
+
+❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ 
+
+
+
+ Test Files  5 failed | 79 passed (84) 
+
+
+
+      Tests  39 failed | 1171 passed (1210) 
+
+
+
+     Errors  7 errors 
+
+
+
+   Start at  14:20:43 
+
+
+
+   Duration  43.75s (transform 8.59s, setup 1.68s, collect 27.52s, tests 26.44s, environment 36.16s, prepare 9.67s) 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+ ❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+ ❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:214:40 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with picker-timeout when no event ever arrives". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+ ❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+ ❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:288:40 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with picker-timeout 30s after returning visible with no delivery". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+ ❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+ ❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:337:40 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with read-stalled 120s after reading starts with no chunks". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ _Assertion.__VITEST_REJECTS__ node_modules/@vitest/expect/dist/index.js:1610:17 
+
+
+
+ ❯ _Assertion.propertyGetter node_modules/chai/index.js:1557:27 
+
+
+
+ ❯ Object.proxyGetter [as get] node_modules/chai/index.js:1645:22 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:354:40 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+The latest test that might've caused the error is "rejects with picker-timeout at the 10 minute absolute cap". It might mean one of the following: 
+
+
+
+- The error was thrown, while Vitest was running this test. 
+
+
+
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown. 
+
+
+
+Error: Error: native-file-picker-unavailable 
+
+
+
+ ❯ buildFolderFileFromNative src/platform/native-file-picker.js:30:9 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:388:37 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+ ❯ runTest node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12 
+
+
+
+ ❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+ ❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+Error: Error: native-file-picker-unavailable 
+
+
+
+ ❯ buildFolderFileFromNative src/platform/native-file-picker.js:30:9 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:393:43 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+ ❯ runTest node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12 
+
+
+
+ ❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+ ❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+Error: Error: native-file-picker-unavailable 
+
+
+
+ ❯ buildFolderFileFromNative src/platform/native-file-picker.js:30:9 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:412:43 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:155:11 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:752:26 
+
+
+
+ ❯ node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20 
+
+
+
+ ❯ runWithTimeout node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10 
+
+
+
+ ❯ runTest node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12 
+
+
+
+ ❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+ ❯ runSuite node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8 
+
+
+
+This error originated in "tests/integration/platform/android-file-picker.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running. 
+
+
+
+Error: AssertionError: expected false to be true // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- true 
+
+
+
++ false 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:50:43 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:73:43 
+
+
+
+Error: AssertionError: expected undefined to deeply equal [ { name: 'notes.md', …(1) } ] 
+
+
+
+- Expected:  
+
+
+
+[ 
+
+
+
+  { 
+
+
+
+    "content": "# Notes", 
+
+
+
+    "name": "notes.md", 
+
+
+
+  }, 
+
+
+
+] 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:86:26 
+
+
+
+Error: AssertionError: expected undefined to be true // Object.is equality 
+
+
+
+- Expected:  
+
+
+
+true 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:94:30 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:101:43 
+
+
+
+Error: AssertionError: expected "spy" to be called with arguments: [ 'folder', Any<String> ] 
+
+
+
+Number of calls: 0 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:113:44 
+
+
+
+Error: AssertionError: expected undefined to deeply equal [ { name: 'notes.md', …(1) } ] 
+
+
+
+- Expected:  
+
+
+
+[ 
+
+
+
+  { 
+
+
+
+    "content": "# Notes", 
+
+
+
+    "name": "notes.md", 
+
+
+
+  }, 
+
+
+
+] 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:128:26 
+
+
+
+Error: AssertionError: expected undefined to deeply equal [ { name: 'photo.png', …(1) } ] 
+
+
+
+- Expected:  
+
+
+
+[ 
+
+
+
+  { 
+
+
+
+    "name": "photo.png", 
+
+
+
+    "reason": "unsupported-type", 
+
+
+
+  }, 
+
+
+
+] 
+
+
+
++ Received:  
+
+
+
+undefined 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:190:28 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+- Expected:  
+
+
+
+Error { 
+
+
+
+  "message": "rejected promise", 
+
+
+
+} 
+
+
+
++ Received:  
+
+
+
+[] 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:206:43 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:214:40 
+
+
+
+Error: AssertionError: expected true to be false // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- false 
+
+
+
++ true 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:242:21 
+
+
+
+Error: AssertionError: expected true to be false // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- false 
+
+
+
++ true 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:270:21 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:288:40 
+
+
+
+Error: AssertionError: expected true to be false // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- false 
+
+
+
++ true 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:320:21 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:337:40 
+
+
+
+Error: AssertionError: promise resolved "[]" instead of rejecting 
+
+
+
+Expected: "[Error: rejected promise]" 
+
+
+
+Received: "Array []" 
+
+
+
+ ❯ tests/integration/platform/android-file-picker.test.js:354:40 
+
+
+
+Error: AssertionError: expected false to be true // Object.is equality 
+
+
+
+- Expected 
+
+
+
++ Received 
+
+
+
+- true 
+
+
+
++ false 
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+1s
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step was skipped
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0s
+
+
+
+svgThis step passed
+
+
+
+0s

@@ -3,12 +3,12 @@ export * from "./protocol-contract.js";
 
 export interface WsHello { type: "auth"; token: string; }
 export interface WsMessage {
-  type: "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel" | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel" | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz";
+  type: "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel" | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel" | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz" | "agent/spawn" | "agent/start" | "agent/pause" | "agent/resume" | "agent/cancel" | "agent/status" | "tools/list" | "tools/invoke";
   requestId?: string;
   payload?: unknown;
 }
 export interface WsEvent {
-  type: "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result" | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result" | "math/tikz/result" | "math/action-required";
+  type: "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result" | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result" | "math/tikz/result" | "math/action-required" | "agent/event" | "agent/status" | "tool/result" | "tool/list";
   requestId?: string;
   payload?: unknown;
 }

@@ -175,3 +175,84 @@ POST   /sessions/:name/save
 DELETE /sessions/:name
 WS     /ws
 ```
+
+## Agent Core (Phase A)
+
+The agent orchestration layer lives in `src/agent/` and persists through the shared SQLite database (migration v4: `agents`, `tasks`).
+
+### Components
+
+| Module | Role |
+|---|---|
+| `agent/agent.ts` | `AgentState` machine (`created → planning → running → completed/failed/cancelled`, plus `waiting_approval` and `paused`), `AgentPermissions`, `AgentDescriptor`, abstract `Agent` base class with cooperative cancellation (`signal`). |
+| `agent/registry.ts` | SQLite CRUD for agents: `register`, `get`, `list(filters)`, `update`, `delete` (leaf-first), `listChildren`. |
+| `agent/queue.ts` | Durable task queue: priority 1–10 (10 = highest, oldest first), transactional claim, `ack`/`nack` (bounded retries) /`requeue`/`failTask`, per-agent cancel. Capacity limited by `SECURITY_LIMITS.maxQueueDepth`. |
+| `agent/runner.ts` | Drives the lifecycle: claims tasks, launches agent instances, mirrors every state change to the registry, emits events, enforces concurrency. Owns subagent spawning and recursive cancellation. |
+| `agent/permissions.ts` | Subagent permission inheritance: tool lists intersect, limits take the minimum (`DEFAULT_MAX_SUBAGENTS=4`, `MAX_SUBAGENT_DEPTH=3`). |
+| `mcp/tool.ts` | Tool contract: name, description, JSON-schema parameters, risk tier (`low`/`medium`/`high`/`critical`), execute. |
+| `mcp/builtin.ts` | Built-in tools wrapping the hardened code-production helpers (workspace confinement, secret denial, process allowlist). |
+| `mcp/registry.ts` | Tool registry with enable/disable persisted in SQLite (`runtime_meta`). |
+| `mcp/service.ts` | Invocation gate: registry -> enabled -> agent tool list -> shared risk policy; `high` blocks on an expiring approval, `critical` is denied. |
+| `mcp/client.ts` | Minimal MCP streamable-HTTP client (`initialize`, `tools/list`, `tools/call`); remote tools register under `mcp_<server>_<tool>` and pass through the same permission pipeline. |
+| `agent/demo-agent.ts` | `demo` type — logs "Hello, I am agent X" and completes; reference implementation for new types. |
+
+New agent types implement `doPlan`/`doExecute` and register in `createDefaultFactory()`. Agents invoke tools inside their execution hooks via `this.callTool(name, params)`.
+
+### REST API
+
+All routes require the bearer token.
+
+```text
+POST /v1/agent/spawn            { name, type, permissionsOverride?, context?, parentId?, projectId?, sessionId?, task? }
+POST /v1/agent/:id/start        -> 202 { agent_id, task_id }
+POST /v1/agent/:id/pause
+POST /v1/agent/:id/resume
+POST /v1/agent/:id/cancel       (cancels the whole subagent subtree)
+GET  /v1/agent/:id/status       -> { status: { agent, currentTask?, recentTasks[], children[] } }
+GET  /v1/agents?state=&type=&parentId=
+```
+
+### Subagents
+
+- `parentId` makes the new agent a subagent: it inherits the parent's `projectId`/`sessionId` unless explicitly overridden.
+- `permissionsOverride` is clamped to the parent envelope — tool lists intersect, `maxSubagents` takes the minimum. Overrides can never expand capability.
+- A parent rejects further children once its `maxSubagents` budget (default 4) is exhausted, and spawning below depth 3 is refused.
+- Spawning under a terminal (completed/failed/cancelled) parent is rejected.
+- Cancelling an agent cancels its entire descendant subtree; cancellation never flows upward.
+- Passing `task` on spawn enqueues a bootstrap task payload immediately.
+
+### Tools & MCP
+
+Built-in tools (risk tier in parentheses): `fs_read` (low), `fs_write` (medium), `fs_edit` (medium), `shell_run` (high, allowlisted executables only), `git_status` (low), `git_diff` (low), `git_commit` (high), `http_request` (medium, domain allowlist via `BDS_TOOL_ALLOWED_DOMAINS`, redirects not followed).
+
+```text
+GET  /v1/tools                     -> tool descriptors + mcp server list
+POST /v1/tools/:name/enable
+POST /v1/tools/:name/disable
+POST /v1/tools/invoke              { agent_id?, tool, params }  (403 on denied/expired approval)
+GET  /approvals/pending            -> unresolved approvals (tool + task actions)
+POST /approvals/:id                { decision: "approved" | "denied" }
+GET  /v1/mcp/servers               -> connected MCP servers
+POST /v1/mcp/connect               { name, url }
+WS   tools/list | tools/invoke     -> tool/list | tool/result
+```
+
+Enforcement order for every call: registry existence -> enabled flag -> agent's `permissions.tools` list -> shared risk policy. `high` tools create an expiring approval (default 5 minutes, `BDS_TOOL_APPROVAL_TTL_MS` to override) and block until a decision arrives over REST/WS; expired approvals are auto-denied and audited.
+
+MCP servers configured in `.better-deepseek.jsonc` (`mcp: [{ name, url, enabled }]`) are auto-connected at startup; failures are logged and non-fatal. Remote tools inherit the server's risk tier (default medium).
+
+### WebSocket commands
+
+Authenticated clients send `{ type, payload }`; lifecycle events broadcast as `agent/event`, status replies as `agent/status`.
+
+```text
+agent/spawn | agent/start | agent/pause | agent/resume | agent/cancel | agent/status
+```
+
+### Semantics
+
+- `start` is rejected for terminal or already-running/planning agents.
+- Paused agents keep queued tasks parked; `resume` releases them.
+- `cancel` aborts in-flight work via the agent's signal and cancels all its non-terminal tasks (`cancelled`, never retried).
+- Failed attempts retry up to `maxRetries` (default 3), then the task and agent end `failed`.
+- Deterministic launch failures (unknown type) fail immediately without consuming retries.

@@ -32,7 +32,7 @@ import {
   removeAllMessageHosts,
   removeMessageHost,
 } from "./dom/host.js";
-import { handleAutoWebFetch, handleAutoGitHubFetch, handleAutoTwitterFetch, handleAutoYouTubeFetch, handleAutoSearch, handleAutoSearchForRun, handleAutoMcpCall, handleAutoFileRead, handleAutoSearchInDirectory, handleAutoListDir, findChatEditor } from "./auto.js";
+import { handleAutoWebFetch, handleAutoGitHubFetch, handleAutoTwitterFetch, handleAutoYouTubeFetch, handleAutoSearch, handleAutoSearchForRun, handleAutoMcpCall, handleAutoFileRead, handleAutoSearchInDirectory, handleAutoListDir, findChatEditor, handleAutoAgentSpawn, handleAutoAgentStatus, handleAutoAgentCancel } from "./auto.js";
 import { handleManagedAutoContinuation, isManagedRunActive, trySynthesizeReport } from "./deep-research.js";
 
 import { mount, unmount } from "svelte";
@@ -684,6 +684,9 @@ export function processMessageNode(node, nodeIndex = -1, nodes = null, context =
       if (!stateData.autoYouTubeFetchesHandled) stateData.autoYouTubeFetchesHandled = new Set();
       if (!stateData.autoSearchQueriesHandled) stateData.autoSearchQueriesHandled = new Set();
       if (!stateData.autoMcpCallsHandled) stateData.autoMcpCallsHandled = new Set();
+      if (!stateData.autoAgentSpawnsHandled) stateData.autoAgentSpawnsHandled = new Set();
+      if (!stateData.autoAgentStatusHandled) stateData.autoAgentStatusHandled = new Set();
+      if (!stateData.autoAgentCancelsHandled) stateData.autoAgentCancelsHandled = new Set();
       if (!stateData.autoFileReadsHandled) stateData.autoFileReadsHandled = new Set();
       if (!stateData.autoDirSearchesHandled) stateData.autoDirSearchesHandled = new Set();
       if (!stateData.autoDirListsHandled) stateData.autoDirListsHandled = new Set();
@@ -740,6 +743,32 @@ export function processMessageNode(node, nodeIndex = -1, nodes = null, context =
         if (!stateData.autoMcpCallsHandled.has(mcpKey)) {
           stateData.autoMcpCallsHandled.add(mcpKey);
           handleAutoMcpCall(mcp.serverUrl, mcp.toolName, mcp.args);
+        }
+      }
+
+      for (const spawn of (parsed.autoRequests.agentSpawns || [])) {
+        if (suppressManagedAuto) continue;
+        const spawnKey = `${spawn.name}|${spawn.type}|${spawn.task}`;
+        if (!stateData.autoAgentSpawnsHandled.has(spawnKey)) {
+          stateData.autoAgentSpawnsHandled.add(spawnKey);
+          handleAutoAgentSpawn(spawn.name, spawn.type, spawn.start, spawn.task);
+        }
+      }
+
+      for (const agentId of (parsed.autoRequests.agentStatus || [])) {
+        if (suppressManagedAuto) continue;
+        const statusKey = agentId || "__all__";
+        if (!stateData.autoAgentStatusHandled.has(statusKey)) {
+          stateData.autoAgentStatusHandled.add(statusKey);
+          handleAutoAgentStatus(agentId);
+        }
+      }
+
+      for (const agentId of (parsed.autoRequests.agentCancels || [])) {
+        if (suppressManagedAuto) continue;
+        if (!stateData.autoAgentCancelsHandled.has(agentId)) {
+          stateData.autoAgentCancelsHandled.add(agentId);
+          handleAutoAgentCancel(agentId);
         }
       }
 

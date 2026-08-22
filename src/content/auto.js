@@ -1282,3 +1282,114 @@ export async function sendFileWithMessage(file, autoMessage = "", logLabel = "Au
 async function injectFileAndSend(file, autoMessage = "") {
   return sendFileWithMessage(file, autoMessage);
 }
+
+// ── BDS Runtime Agent Bridge (Phase A-F) ──
+
+function runtimeAgentMessage(tag, payload) {
+  return `<BetterDeepSeek>\n[BDS:AUTO_AGENT_RESULT]\n${JSON.stringify(payload)}\n[/BDS:AUTO_AGENT_RESULT]\n[BDS:AUTO] ${tag}\n</BetterDeepSeek>`;
+}
+
+/**
+ * Handle <BDS:AUTO:AGENT_SPAWN name="..." type="..." [start="true"]>task</BDS:AUTO:AGENT_SPAWN>.
+ * Spawns an agent on the local runtime; when a task body (or start attr) is
+ * present the agent is started immediately and its id is reported back.
+ */
+export async function handleAutoAgentSpawn(name, type, start, taskBody) {
+  const agentName = String(name || "").trim() || `chat-agent-${Date.now().toString(36)}`;
+  const agentType = String(type || "demo").trim();
+  const task = String(taskBody || "").trim();
+  const shouldStart = String(start ?? "true").toLowerCase() !== "false";
+  devLog("Auto", `Spawning runtime agent "${agentName}" (type=${agentType}, start=${shouldStart})`);
+  try {
+    const res = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { type: "BDS_RUNTIME_AGENT_SPAWN", spec: { name: agentName, type: agentType, ...(task && shouldStart ? { task } : {}) } },
+        (response) => {
+          if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+          else if (response?.ok) resolve(response);
+          else reject(new Error(response?.error || "spawn failed"));
+        }
+      );
+    });
+    const agentId = res.agent?.id || "";
+    await sendPromptToChat(
+      runtimeAgentMessage(
+        `Agent spawned: "${agentName}"${res.task_id ? " and started" : ""}.`,
+        { success: true, agentId, taskId: res.task_id || null, name: agentName, type: agentType, started: Boolean(res.task_id), note: "Use BDS:AUTO:AGENT_STATUS to check progress and BDS:AUTO:AGENT_CANCEL to stop it." }
+      ),
+      "Runtime agent spawn"
+    );
+  } catch (error) {
+    devLog("Auto", `Agent spawn failed: ${error.message}`);
+    await sendPromptToChat(
+      runtimeAgentMessage(`Agent spawn failed for "${agentName}".`, { success: false, error: String(error.message || error), hint: "Is the local runtime running with a valid token configured in BDS settings?" }),
+      "Runtime agent spawn error"
+    );
+  }
+}
+
+/** Handle <BDS:AUTO:AGENT_STATUS [id="..."]> — report one agent or all agents. */
+export async function handleAutoAgentStatus(agentId) {
+  const id = String(agentId || "").trim();
+  devLog("Auto", `Fetching runtime agent status ${id || "(all)"}`);
+  try {
+    let payload;
+    if (id) {
+      const res = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: "BDS_RUNTIME_AGENT_STATUS", agentId: id }, (response) => {
+          if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+          else if (response?.ok) resolve(response);
+          else reject(new Error(response?.error || "status failed"));
+        });
+      });
+      const s = res.status || {};
+      payload = {
+        success: true,
+        agent: { id: s.agent?.id, name: s.agent?.name, type: s.agent?.type, state: s.agent?.state },
+        currentTask: s.currentTask ? { id: s.currentTask.id, type: s.currentTask.type, status: s.currentTask.status, retries: s.currentTask.retries } : null,
+        recentTasks: (s.recentTasks || []).slice(0, 5).map((t) => ({ id: t.id, status: t.status, error: t.error ?? null })),
+        children: s.children || [],
+      };
+    } else {
+      const res = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: "BDS_RUNTIME_AGENTS_LIST" }, (response) => {
+          if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+          else if (response?.ok) resolve(response);
+          else reject(new Error(response?.error || "list failed"));
+        });
+      });
+      payload = {
+        success: true,
+        agents: (res.agents || []).slice(0, 20).map((a) => ({ id: a.id, name: a.name, type: a.type, state: a.state })),
+      };
+    }
+    await sendPromptToChat(runtimeAgentMessage("Agent status report.", payload), "Runtime agent status");
+  } catch (error) {
+    await sendPromptToChat(
+      runtimeAgentMessage("Agent status fetch failed.", { success: false, error: String(error.message || error) }),
+      "Runtime agent status error"
+    );
+  }
+}
+
+/** Handle <BDS:AUTO:AGENT_CANCEL id="..."> — cancel an agent subtree. */
+export async function handleAutoAgentCancel(agentId) {
+  const id = String(agentId || "").trim();
+  if (!id) return;
+  devLog("Auto", `Cancelling runtime agent ${id}`);
+  try {
+    const res = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: "BDS_RUNTIME_AGENT_CANCEL", agentId: id }, (response) => {
+        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+        else if (response?.ok) resolve(response);
+        else reject(new Error(response?.error || "cancel failed"));
+      });
+    });
+    await sendPromptToChat(runtimeAgentMessage(`Agent ${id} cancelled.`, { success: true, agentId: id }), "Runtime agent cancel");
+  } catch (error) {
+    await sendPromptToChat(
+      runtimeAgentMessage(`Agent cancel failed for ${id}.`, { success: false, agentId: id, error: String(error.message || error) }),
+      "Runtime agent cancel error"
+    );
+  }
+}

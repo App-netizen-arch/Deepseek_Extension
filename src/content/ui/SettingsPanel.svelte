@@ -97,6 +97,11 @@
   let subUtilitiesOpen = $state(false);
   let subCSSOpen = $state(false);
   let subMcpOpen = $state(false);
+  let subRuntimeOpen = $state(false);
+  let runtimeUrl = $state("");
+  let runtimeToken = $state("");
+  let runtimeTesting = $state(false);
+  let runtimeTestResult = $state(null);
   let showMcpEditor = $state(false);
   let editingMcp = $state(null);
   let mcpEditorName = $state("");
@@ -148,6 +153,45 @@
     { key: "savedItems", label: t('drawer.sectionSavedItems') },
   ];
   let selectedSections = $state(new Set(EXPORT_SECTIONS.map(s => s.key)));
+
+  // ── Local Runtime configuration ──
+  $effect(() => {
+    chrome.storage.local.get(["bdsRuntimeUrl", "bdsRuntimeToken"]).then((stored) => {
+      runtimeUrl = String(stored.bdsRuntimeUrl || "");
+      runtimeToken = String(stored.bdsRuntimeToken || "");
+    });
+  });
+
+  async function saveRuntimeConfig() {
+    const url = String(runtimeUrl || "").trim().replace(/\/+$/, "") || "http://127.0.0.1:3037";
+    const token = String(runtimeToken || "").trim();
+    await chrome.storage.local.set({ bdsRuntimeUrl: url, bdsRuntimeToken: token });
+    runtimeTestResult = token.length < 32
+      ? { ok: false, message: t('settings.runtimeTokenShort') }
+      : { ok: true, message: t('settings.runtimeSaved') };
+  }
+
+  async function testRuntimeConnection() {
+    await saveRuntimeConfig();
+    if (runtimeTestResult && !runtimeTestResult.ok) return;
+    runtimeTesting = true;
+    runtimeTestResult = null;
+    try {
+      const res = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: "BDS_RUNTIME_PING" }, (response) => {
+          if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+          else resolve(response || {});
+        });
+      });
+      runtimeTestResult = res.ok
+        ? { ok: true, message: t('settings.runtimeReachable', { service: res.service || 'runtime' }) }
+        : { ok: false, message: res.error || t('settings.runtimeUnreachable') };
+    } catch (err) {
+      runtimeTestResult = { ok: false, message: String(err.message || err) };
+    } finally {
+      runtimeTesting = false;
+    }
+  }
 
   function captureFormSnapshot() {
     return JSON.stringify({
@@ -528,6 +572,9 @@
     { key: 'subMcp', labelKey: 'mcp.sectionTitle', settingKeys: [
       'mcp.addServer', 'mcp.inlineMaxChars',
     ]},
+    { key: 'subRuntime', labelKey: 'settings.subRuntime', settingKeys: [
+      'settings.runtimeUrl', 'settings.runtimeToken', 'settings.runtimeTest',
+    ]},
     { key: 'subUtilities', labelKey: 'settings.subUtilities', settingKeys: [
       'apiPlayground.title', 'drawer.exportAll', 'drawer.importAll', 'settings.disableTipBox',
     ]},
@@ -588,6 +635,7 @@
       subResearch: subResearchOpen, subVoice: subVoiceOpen,
       subIntegrations: subIntegrationsOpen, subCSS: subCSSOpen,
       subMcp: subMcpOpen,
+      subRuntime: subRuntimeOpen,
       subUtilities: subUtilitiesOpen,
     };
   }
@@ -599,6 +647,7 @@
     subResearchOpen = states.subResearch; subVoiceOpen = states.subVoice;
     subIntegrationsOpen = states.subIntegrations; subCSSOpen = states.subCSS;
     subMcpOpen = states.subMcp;
+    subRuntimeOpen = states.subRuntime;
     subUtilitiesOpen = states.subUtilities;
   }
 
@@ -623,6 +672,7 @@
     subIntegrationsOpen = matchingKeys.has('subIntegrations');
     subCSSOpen = matchingKeys.has('subCSS');
     subMcpOpen = matchingKeys.has('subMcp');
+    subRuntimeOpen = matchingKeys.has('subRuntime');
     subUtilitiesOpen = matchingKeys.has('subUtilities');
   });
 
@@ -2014,6 +2064,41 @@
     </div>
     {/if}
 
+    {#if isSectionMatch('subRuntime')}
+    <button type="button" class="bds-sub-toggle" class:open={subRuntimeOpen} onclick={() => subRuntimeOpen = !subRuntimeOpen} aria-expanded={subRuntimeOpen}>
+      {t('settings.subRuntime')}
+      <span class="bds-chevron">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </button>
+    <div class="bds-sub-content" class:open={subRuntimeOpen}>
+      <div class="bds-sub-inner">
+        <p style="font-size: 11px; opacity: 0.6; margin: 0 0 8px;">{t('settings.runtimeDescription')}</p>
+        <div class="bds-toggle-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+          <label class="bds-toggle-label" for="bds-runtime-url">{t('settings.runtimeUrl')}</label>
+          <input id="bds-runtime-url" type="text" class="bds-input" style="width: 100%; box-sizing: border-box;" placeholder="http://127.0.0.1:3037" bind:value={runtimeUrl} />
+        </div>
+        <div class="bds-toggle-row" style="flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 8px;">
+          <label class="bds-toggle-label" for="bds-runtime-token">{t('settings.runtimeToken')}</label>
+          <input id="bds-runtime-token" type="password" class="bds-input" style="width: 100%; box-sizing: border-box;" placeholder="{t('settings.runtimeTokenPlaceholder')}" bind:value={runtimeToken} autocomplete="off" />
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button type="button" class="bds-btn-outlined" style="font-size: 11px; padding: 5px 10px;" onclick={saveRuntimeConfig}>{t('settings.runtimeSave')}</button>
+          <button type="button" class="bds-btn-outlined" style="font-size: 11px; padding: 5px 10px;" onclick={testRuntimeConnection} disabled={runtimeTesting}>
+            {runtimeTesting ? t('settings.runtimeTesting') : t('settings.runtimeTest')}
+          </button>
+        </div>
+        {#if runtimeTestResult}
+          <p style="font-size: 11px; margin: 6px 0 0;" class:bds-runtime-ok={runtimeTestResult.ok} class:bds-runtime-err={!runtimeTestResult.ok}>
+            {runtimeTestResult.message}
+          </p>
+        {/if}
+      </div>
+    </div>
+    {/if}
+
     {#if isSectionMatch('subUtilities')}
     <button type="button" class="bds-sub-toggle" class:open={subUtilitiesOpen} onclick={() => subUtilitiesOpen = !subUtilitiesOpen} aria-expanded={subUtilitiesOpen}>
       {t('settings.subUtilities')}
@@ -2662,4 +2747,6 @@
     color: var(--bds-text-primary);
     font-variant-numeric: tabular-nums;
   }
+  :global(.bds-runtime-ok) { color: #2ecc71; }
+  :global(.bds-runtime-err) { color: #e74c3c; }
 </style>

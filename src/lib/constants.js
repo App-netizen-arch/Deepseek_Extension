@@ -39,7 +39,7 @@ export const BRIDGE_EVENTS = {
 };
 
 // ── Versioning ──
-export const SYSTEM_PROMPT_TEMPLATE_VERSION = 15;
+export const SYSTEM_PROMPT_TEMPLATE_VERSION = 16;
 export const DOWNLOAD_BEHAVIOR_VERSION = 2;
 export const LONG_WORK_STALE_MS = 30000;
 
@@ -141,6 +141,9 @@ export const DEFAULT_SYSTEM_PROMPT = [
   "14. Clarifying Questions: <BDS:ask_question>[{\"id\":\"...\",\"question\":\"...\",\"type\":\"...\"}]</BDS:ask_question>",
   "15. To-Do List/Checklist Card: <BDS:todo>\\n### Step 1 Title\\nStep 1 Description\\n\\n### Step 2 Title\\nStep 2 Description\\n</BDS:todo>",
   "16. MCP Tool Invocation: <BDS:AUTO:MCP url=\"http://server:port\" tool=\"tool_name\" args='{\"key\":\"value\"}'></BDS:AUTO:MCP>",
+  "17. Agent Spawn: <BDS:AUTO:AGENT_SPAWN name=\"agent-name\" type=\"demo\" start=\"true\">task description</BDS:AUTO:AGENT_SPAWN>",
+  "18. Agent Status: <BDS:AUTO:AGENT_STATUS id=\"agent-id\" />  (omit id to list all agents)",
+  "19. Agent Cancel: <BDS:AUTO:AGENT_CANCEL id=\"agent-id\" />",
   "",
   "When using <BDS:ask_question>JSON_ARRAY</BDS:ask_question>:",
   "- Use this tool when you are not 90% sure about the user's project, task, or ambiguous request.",
@@ -212,7 +215,29 @@ export const DEFAULT_SYSTEM_PROMPT = [
   "EXAMPLES:",
   "<BDS:AUTO:MCP url=\"exa\" tool=\"web_search_exa\" args='{\"query\": \"latest AI news\"}'></BDS:AUTO:MCP>",
   "<BDS:AUTO:MCP url=\"https://mcp.exa.ai/mcp\" tool=\"web_search_exa\" args='{\"query\": \"latest AI news\"}'></BDS:AUTO:MCP>",
+
+  "When using <BDS:AUTO:AGENT_SPAWN>, <BDS:AUTO:AGENT_STATUS>, <BDS:AUTO:AGENT_CANCEL>:",
   "",
+  "PURPOSE: Run autonomous agents on the user's LOCAL machine via the Better DeepSeek runtime.",
+  "Agents plan and execute tasks with tools (files, shell, git) under a permission/approval",
+  "system; high-risk actions pause until the user approves them in the UI.",
+  "",
+  "ATTRIBUTES:",
+  "- name: Short descriptive agent name (required). Derive it from the task.",
+  "- type: Agent type (optional, default \"demo\").",
+  "- start: \"true\" (default) starts the agent immediately with the tag body as its task.",
+  "- Body of AGENT_SPAWN = the task instruction given to the agent.",
+  "",
+  "RULES:",
+  "- Only spawn agents when the user asks to run/automate a task on their machine, or when an autonomous background task clearly helps.",
+  "- Write the task body as one clear, self-contained instruction paragraph.",
+  "- After spawning you receive the agentId; report it to the user.",
+  "- Use AGENT_STATUS with that id to check progress when asked, and AGENT_CANCEL to stop it.",
+  "",
+  "EXAMPLE:",
+  "<BDS:AUTO:AGENT_SPAWN name=\"repo-cleaner\" type=\"demo\">Scan the workspace for unused imports and report findings.</BDS:AUTO:AGENT_SPAWN>",
+  "<BDS:AUTO:AGENT_STATUS id=\"<agentId>\" />",
+  "",  "",
   "WHEN TO USE:",
   "✓ When the user asks to interact with external tools, databases, or APIs connected via MCP.",
   "✓ When the available tool schemas indicate a tool that can answer the user's question.",

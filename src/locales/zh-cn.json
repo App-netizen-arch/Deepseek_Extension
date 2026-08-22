@@ -186,7 +186,19 @@
       "advancedSearchPlaceholder": "搜索设置…",
       "advancedNoResults": "未找到匹配的设置。",
       "disableTipBox": "禁用提示框",
-      "disableTipBoxHint": "每次打开抽屉时显示随机提示。"
+      "disableTipBoxHint": "每次打开抽屉时显示随机提示。",
+      "subRuntime": "本地运行时（智能体）",
+      "runtimeDescription": "将 Better DeepSeek 连接到本地智能体运行时。从聊天中启动的智能体在本机运行。",
+      "runtimeUrl": "运行时 URL",
+      "runtimeToken": "运行时令牌",
+      "runtimeTokenPlaceholder": "粘贴 setup-token.mjs 输出的令牌",
+      "runtimeSave": "保存",
+      "runtimeTest": "测试连接",
+      "runtimeTesting": "测试中…",
+      "runtimeSaved": "已保存。",
+      "runtimeTokenShort": "令牌长度至少 32 个字符。",
+      "runtimeReachable": "已连接到 {service}。",
+      "runtimeUnreachable": "无法连接运行时——它启动了吗？"
     },
     "skillList": {
       "title": "技能集",

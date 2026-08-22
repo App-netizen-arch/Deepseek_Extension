@@ -186,7 +186,19 @@
       "advancedSearchPlaceholder": "Search settings...",
       "advancedNoResults": "No matching settings found.",
       "disableTipBox": "Disable Tip Box",
-      "disableTipBoxHint": "Shows a random tip each time you open the drawer."
+      "disableTipBoxHint": "Shows a random tip each time you open the drawer.",
+      "subRuntime": "Local Runtime (Agents)",
+      "runtimeDescription": "Connect Better DeepSeek to your local agent runtime (Phases A-F). Agents spawned from chat run on this machine.",
+      "runtimeUrl": "Runtime URL",
+      "runtimeToken": "Runtime token",
+      "runtimeTokenPlaceholder": "paste token from scripts/setup-token.mjs",
+      "runtimeSave": "Save",
+      "runtimeTest": "Test connection",
+      "runtimeTesting": "Testing…",
+      "runtimeSaved": "Saved.",
+      "runtimeTokenShort": "Token must be at least 32 characters.",
+      "runtimeReachable": "Connected to {service}.",
+      "runtimeUnreachable": "Runtime unreachable — is it running?"
     },
     "skillList": {
       "title": "Skill Set",

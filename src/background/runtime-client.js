@@ -75,3 +75,57 @@ export async function listAgents(filters = {}) {
     return { ok: false, configured: true, error: String(error && error.message ? error.message : error) };
   }
 }
+
+/** Unauthenticated health probe used by the settings "Test connection" button. */
+export async function pingRuntime() {
+  const { url } = await getRuntimeConfig();
+  try {
+    const resp = await fetch(`${url}/health`);
+    if (!resp.ok) return { ok: false, error: `runtime returned ${resp.status}` };
+    const data = await resp.json().catch(() => ({}));
+    return { ok: true, service: data.service || "runtime", url };
+  } catch (error) {
+    return { ok: false, error: String(error && error.message ? error.message : error) };
+  }
+}
+
+async function runtimeJson(method, path, body) {
+  const { url, token } = await getRuntimeConfig();
+  if (!token) return { ok: false, error: "BDS_RUNTIME_TOKEN is not set — configure it in BDS settings" };
+  try {
+    const resp = await fetch(`${url}${path}`, {
+      method,
+      headers: { ...authHeaders(token), ...(body !== undefined ? { "Content-Type": "application/json" } : {}) },
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok || data.ok === false) {
+      return { ok: false, status: resp.status, error: data.error || `runtime returned ${resp.status}` };
+    }
+    return { ok: true, ...data };
+  } catch (error) {
+    return { ok: false, error: String(error && error.message ? error.message : error) };
+  }
+}
+
+/** Spawn an agent; when `task` is provided the runtime starts it immediately. */
+export async function spawnRuntimeAgent(spec = {}) {
+  const body = {};
+  if (spec.name) body.name = spec.name;
+  if (spec.type) body.type = spec.type;
+  if (spec.task) body.task = { instruction: spec.task };
+  if (spec.parentId) body.parentId = spec.parentId;
+  return runtimeJson("POST", "/v1/agent/spawn", body);
+}
+
+/** Full status snapshot for one agent. */
+export async function fetchAgentStatus(agentId) {
+  if (!agentId) return { ok: false, error: "agent id is required" };
+  return runtimeJson("GET", `/v1/agent/${encodeURIComponent(agentId)}/status`);
+}
+
+/** Cancel an agent and its subtree. */
+export async function cancelRuntimeAgent(agentId) {
+  if (!agentId) return { ok: false, error: "agent id is required" };
+  return runtimeJson("POST", `/v1/agent/${encodeURIComponent(agentId)}/cancel`);
+}

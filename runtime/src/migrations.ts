@@ -38,6 +38,23 @@ CREATE TABLE IF NOT EXISTS tasks (
 CREATE INDEX IF NOT EXISTS idx_tasks_ready ON tasks(status, priority DESC, scheduled_at ASC);
 CREATE INDEX IF NOT EXISTS idx_tasks_agent ON tasks(agent_id, status);
 `},
+ {version:5,name:"workflow_runs",sql:`
+CREATE TABLE IF NOT EXISTS workflow_runs (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  definition_json TEXT NOT NULL,
+  inputs_json TEXT NOT NULL DEFAULT '{}',
+  step_states_json TEXT NOT NULL DEFAULT '{}',
+  agent_id TEXT,
+  error TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  started_at TEXT,
+  finished_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON workflow_runs(status, updated_at DESC);
+`},
 ];
 export function migrate(db:Database.Database):void{db.exec(MIGRATIONS[0].sql);const applied=db.prepare("SELECT version FROM schema_migrations ORDER BY version").all() as Array<{version:number}>;const seen=new Set(applied.map(r=>r.version));for(const migration of MIGRATIONS){if(seen.has(migration.version))continue;const tx=db.transaction(()=>{db.exec(migration.sql);db.prepare("INSERT INTO schema_migrations(version,name,applied_at) VALUES(?,?,?)").run(migration.version,migration.name,new Date().toISOString());});try{tx();}catch(error){if(migration.version===2&&String(error).includes("duplicate column name")){db.exec("CREATE INDEX IF NOT EXISTS idx_audit_task_created ON audit_events(task_id,created_at);");db.prepare("INSERT INTO schema_migrations(version,name,applied_at) VALUES(?,?,?)").run(migration.version,migration.name,new Date().toISOString());}else throw error;}}}
 export function schemaVersion(db:Database.Database):number{const row=db.prepare("SELECT MAX(version) AS version FROM schema_migrations").get() as {version?:number}|undefined;return row?.version??0;}

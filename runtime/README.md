@@ -194,6 +194,9 @@ The agent orchestration layer lives in `src/agent/` and persists through the sha
 | `mcp/registry.ts` | Tool registry with enable/disable persisted in SQLite (`runtime_meta`). |
 | `mcp/service.ts` | Invocation gate: registry -> enabled -> agent tool list -> shared risk policy; `high` blocks on an expiring approval, `critical` is denied. |
 | `mcp/client.ts` | Minimal MCP streamable-HTTP client (`initialize`, `tools/list`, `tools/call`); remote tools register under `mcp_<server>_<tool>` and pass through the same permission pipeline. |
+| `workflow/loader.ts` | Parses/validates `.yml`/`.yaml`/`.json` definitions from `<workspace>/.better-deepseek/workflows` (or `BDS_WORKFLOWS_DIR`): DAG checks, duplicate ids, cycles. |
+| `workflow/template.ts` | `{{path}}` interpolation over `{ input, ...stepsById }`; whole-string templates preserve value types, embedded ones stringify. |
+| `workflow/runner.ts` | Durable run engine (migration v5 `workflow_runs`): DAG scheduling with bounded concurrency, per-step retries/timeouts, `when` guards, `continue_on_error`, cancellation cascading through the supervisor agent. |
 | `agent/demo-agent.ts` | `demo` type — logs "Hello, I am agent X" and completes; reference implementation for new types. |
 
 New agent types implement `doPlan`/`doExecute` and register in `createDefaultFactory()`. Agents invoke tools inside their execution hooks via `this.callTool(name, params)`.
@@ -240,6 +243,46 @@ WS   tools/list | tools/invoke     -> tool/list | tool/result
 Enforcement order for every call: registry existence -> enabled flag -> agent's `permissions.tools` list -> shared risk policy. `high` tools create an expiring approval (default 5 minutes, `BDS_TOOL_APPROVAL_TTL_MS` to override) and block until a decision arrives over REST/WS; expired approvals are auto-denied and audited.
 
 MCP servers configured in `.better-deepseek.jsonc` (`mcp: [{ name, url, enabled }]`) are auto-connected at startup; failures are logged and non-fatal. Remote tools inherit the server's risk tier (default medium).
+
+### Workflows
+
+Definitions live in `<workspace>/.better-deepseek/workflows/*.yml|json` (override with `BDS_WORKFLOWS_DIR`). Steps may be `tool` (registry tool through the permission pipeline) or `agent` (spawns a subagent under a per-run supervisor, so run cancellation cancels the whole subtree).
+
+```yaml
+name: Research and Summarize
+description: Search web, extract, summarize.
+steps:
+  - id: search
+    type: tool
+    tool: web_search
+    params: { query: "{{input.topic}}" }
+  - id: extract
+    type: tool
+    tool: fs_read          # any registered tool
+    depends_on: [search]
+    params: { path: "{{search.result.path}}" }
+  - id: summarize
+    type: agent            # agent TYPE (e.g. demo); params become its task payload
+    agent: demo
+    depends_on: [extract]
+    retries: 2             # retry budget for transient failures
+    when: "{{extract.result.content}}"   # skip step when falsy
+    timeout_ms: 60000      # hard per-step deadline (default 120000)
+    continue_on_error: true              # dependents still run if this fails
+```
+
+Semantics: steps without `depends_on` run in declared order; independent ready steps launch concurrently (per-run cap 4). A failed step fails the run unless every dependent is released via `continue_on_error`; dependents of unreleased failures are `skipped`. Templates resolve against `{ input, ...stepsById }` (`{{input.x}}`, `{{stepid.result.y}}`, or `{{steps.stepid.result.y}}`).
+
+```text
+GET  /v1/workflows                 -> available definitions
+POST /v1/workflow/run              { name, input } -> 202 { run_id }
+GET  /v1/workflow/:id/status       -> full run record (status + per-step states)
+GET  /v1/workflow/runs             -> recent runs
+POST /v1/workflow/:id/cancel       -> cancels run + supervisor subtree (200/409)
+WS   workflow/run | workflow/cancel -> workflow/event broadcasts
+```
+
+Run states: `pending -> running -> completed | failed | cancelled`. Step states: `pending -> running -> completed | failed | skipped`.
 
 ### WebSocket commands
 

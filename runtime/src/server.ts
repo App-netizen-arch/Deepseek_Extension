@@ -25,6 +25,8 @@ import { createBuiltinTools } from "./mcp/builtin.js";
 import { discoverRemoteTools, type McpRemoteServer } from "./mcp/client.js";
 import { loadAgentConfig } from "./agent-config.js";
 import { log } from "./operational.js";
+import { WorkflowRunner } from "./workflow/runner.js";
+import { findWorkflow, loadWorkflowDefinitions } from "./workflow/loader.js";
 
 const store = new RuntimeStore();
 const startedAt = Date.now();
@@ -53,6 +55,15 @@ const agentRunner = new AgentRunner(agentRegistry, agentQueue, createDefaultFact
   onEvent: (event) => broadcast({ type: "agent/event", payload: event }),
   toolInvoker: (caller, toolName, params) => toolService.invoke(caller, toolName, params),
 });
+const workflowRunner = new WorkflowRunner(
+  {
+    db: store.db,
+    invokeTool: (caller, toolName, params) => toolService.invoke(caller, toolName, params),
+    agentRunner,
+    agentQueue,
+  },
+  { onEvent: (event) => broadcast({ type: "workflow/event", payload: event }) },
+);
 
 /** Discover and register tools from one MCP server; failures are logged only. */
 async function connectMcpServer(server: McpRemoteServer): Promise<number> {
@@ -164,6 +175,13 @@ export function createRuntimeServer() {
       if (req.method === "GET" && req.url === "/v1/mcp/servers") { json(res, 200, { ok: true, servers: [...mcpServers.values()] }); return; }
       if (req.method === "POST" && req.url === "/v1/mcp/connect") { const body = JSON.parse(await readBody(req)) as { name?: string; url?: string }; if (!body.name || !body.url) { json(res, 400, { ok: false, error: "name and url are required" }); return; } try { const count = await connectMcpServer({ name: body.name, url: body.url }); json(res, 200, { ok: true, server: body.name, tools_registered: count }); } catch (error) { json(res, 502, { ok: false, error: error instanceof Error ? error.message : "mcp connect failed" }); } return; }
 
+      // ---- Workflow engine ----
+      if (req.method === "GET" && req.url === "/v1/workflows") { const definitions = await loadWorkflowDefinitions(); json(res, 200, { ok: true, workflows: definitions.map((d) => ({ name: d.name, description: d.description ?? null, steps: d.steps.length, file: d.file })) }); return; }
+      if (req.method === "GET" && req.url === "/v1/workflow/runs") { json(res, 200, { ok: true, runs: workflowRunner.listRuns() }); return; }
+      if (req.method === "POST" && req.url === "/v1/workflow/run") { const body = JSON.parse(await readBody(req)) as { name?: string; input?: Record<string, unknown> }; if (!body.name) { json(res, 400, { ok: false, error: "workflow name is required" }); return; } const definition = await findWorkflow(body.name); if (!definition) { json(res, 404, { ok: false, error: `workflow not found: ${body.name}` }); return; } try { const { runId } = workflowRunner.start(definition, body.input ?? {}); store.audit("workflow.run", { runId, name: definition.name }); json(res, 202, { ok: true, run_id: runId, status: "pending" }); } catch (error) { json(res, 400, { ok: false, error: error instanceof Error ? error.message : "workflow start failed" }); } return; }
+      if (req.method === "GET" && req.url?.match(/^\/v1\/workflow\/[^/]+\/status$/)) { const id = decodeURIComponent(req.url.slice("/v1/workflow/".length, -"/status".length)); const record = workflowRunner.get(id); if (!record) { json(res, 404, { ok: false, error: "run_not_found" }); return; } json(res, 200, { ok: true, run: record }); return; }
+      if (req.method === "POST" && req.url?.match(/^\/v1\/workflow\/[^/]+\/cancel$/)) { const id = decodeURIComponent(req.url.slice("/v1/workflow/".length, -"/cancel".length)); const cancelled = workflowRunner.cancel(id); json(res, cancelled ? 200 : 409, { ok: cancelled, run_id: id, ...(cancelled ? {} : { error: "run is not cancellable (unknown or already finished)" }) }); return; }
+
       // ---- Agent lifecycle ----
       if (req.method === "POST" && req.url === "/v1/agent/spawn") { const body = JSON.parse(await readBody(req)) as { name?: string; type?: string; permissions?: Record<string, unknown>; permissionsOverride?: Record<string, unknown>; context?: Record<string, unknown>; parentId?: string; projectId?: string; sessionId?: string }; if (!body.name || !body.type) { json(res, 400, { ok: false, error: "name and type are required" }); return; } try { const override = body.permissionsOverride ?? body.permissions; const result = agentRunner.spawn({ name: body.name, type: body.type, ...(override !== undefined ? { permissions: override } : {}), ...(body.context !== undefined ? { context: body.context } : {}), ...(body.parentId ? { parentId: body.parentId } : {}), ...(body.projectId ? { projectId: body.projectId } : {}), ...(body.sessionId ? { sessionId: body.sessionId } : {}) }); store.audit("agent.spawn", { agentId: result.agent.id, type: result.agent.type, parentId: result.agent.parentId ?? null }); json(res, 200, { ok: true, agent: result.agent, ...(result.task ? { task_id: result.task.id } : {}) }); return; } catch (error) { json(res, 409, { ok: false, error: error instanceof Error ? error.message : "spawn failed" }); return; } }
       if (req.method === "GET" && req.url?.match(/^\/v1\/agents(\?.*)?$/)) { const url = new URL(req.url, `http://${HOST}`); const filters: AgentListFilters = {}; const state = url.searchParams.get("state"); const type = url.searchParams.get("type"); const parentId = url.searchParams.get("parentId"); if (state) filters.state = state as AgentListFilters["state"]; if (type) filters.type = type; if (parentId) filters.parentId = parentId; json(res, 200, { ok: true, agents: agentRegistry.list(filters) }); return; }
@@ -206,6 +224,8 @@ export function createRuntimeServer() {
       if (message.type === "agent/status") { const id = String((message as { payload?: { agent_id?: string } }).payload?.agent_id ?? ""); if (!agentRegistry.get(id)) throw new Error(`agent ${id} does not exist`); socket.send(JSON.stringify({ type: "agent/status", requestId: (message as { requestId?: string }).requestId, payload: agentRunner.status(id) } satisfies WsEvent)); return; }
       if (message.type === "tools/list") { socket.send(JSON.stringify({ type: "tool/list", requestId: (message as { requestId?: string }).requestId, payload: { tools: toolRegistry.list(), mcp_servers: [...mcpServers.keys()] } } satisfies WsEvent)); return; }
       if (message.type === "tools/invoke") { const payload = (message as { payload?: { agent_id?: string; tool?: string; params?: Record<string, unknown> } }).payload; if (!payload?.tool) throw new Error("tool is required"); let permissions; if (payload.agent_id) { const descriptor = agentRegistry.get(payload.agent_id); if (!descriptor) throw new Error(`agent ${payload.agent_id} does not exist`); permissions = descriptor.permissions; } const result = await toolService.invoke({ agentId: payload.agent_id ?? "ws", ...(permissions !== undefined ? { permissions } : {}) }, payload.tool, payload.params ?? {}); socket.send(JSON.stringify({ type: "tool/result", requestId: (message as { requestId?: string }).requestId, payload: { ok: true, result } } satisfies WsEvent)); return; }
+      if (message.type === "workflow/run") { const payload = (message as { payload?: { name?: string; input?: Record<string, unknown> } }).payload; if (!payload?.name) throw new Error("workflow name is required"); const definition = await findWorkflow(payload.name); if (!definition) throw new Error(`workflow not found: ${payload.name}`); const { runId } = workflowRunner.start(definition, payload.input ?? {}); socket.send(JSON.stringify({ type: "workflow/event", requestId: (message as { requestId?: string }).requestId, payload: { kind: "run_started", runId } } satisfies WsEvent)); return; }
+      if (message.type === "workflow/cancel") { const runId = String((message as { payload?: { run_id?: string } }).payload?.run_id ?? ""); const cancelled = workflowRunner.cancel(runId); socket.send(JSON.stringify({ type: "workflow/event", requestId: (message as { requestId?: string }).requestId, payload: { kind: cancelled ? "run_cancelled" : "run_failed", runId, detail: cancelled ? undefined : "not cancellable" } } satisfies WsEvent)); return; }
       store.audit("ws.message.unsupported", { type: message.type }); socket.send(JSON.stringify({ type: "runtime/error", payload: { message: `unsupported message: ${message.type}` } } satisfies WsEvent));
     } catch (error) { socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "invalid message" } } satisfies WsEvent)); } }); socket.on("close", () => { clearTimeout(timeout); clients.delete(socket); }); });
   server.on("upgrade", (req, socket, head) => { const url = new URL(req.url ?? "/", `http://${HOST}`); if (url.pathname !== "/ws") { socket.destroy(); return; } wsServer.handleUpgrade(req, socket, head, (ws) => wsServer.emit("connection", ws, req)); });

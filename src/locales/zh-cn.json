@@ -1358,6 +1358,9 @@
       "agent": "任务",
       "approve": "允许",
       "deny": "拒绝"
+    },
+    "agentStatus": {
+      "title": "智能体"
     }
   }
 }

@@ -1358,6 +1358,9 @@
       "agent": "Task",
       "approve": "Approve",
       "deny": "Deny"
+    },
+    "agentStatus": {
+      "title": "Agents"
     }
   }
 }

@@ -1358,6 +1358,9 @@
       "agent": "Görev",
       "approve": "Onayla",
       "deny": "Reddet"
+    },
+    "agentStatus": {
+      "title": "Ajanlar"
     }
   }
 }

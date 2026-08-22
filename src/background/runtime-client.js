@@ -57,3 +57,21 @@ export async function decideApproval(id, decision) {
     return { ok: false, error: String(error && error.message ? error.message : error) };
   }
 }
+
+/** List known agents (for the status panel); null-ish results on failure. */
+export async function listAgents(filters = {}) {
+  const { url, token } = await getRuntimeConfig();
+  if (!token) return { ok: false, configured: false, error: "BDS runtime token is not set" };
+  try {
+    const params = new URLSearchParams();
+    if (filters.state) params.set("state", filters.state);
+    const qs = params.toString();
+    const resp = await fetch(`${url}/v1/agents${qs ? `?${qs}` : ""}`, { headers: authHeaders(token) });
+    if (resp.status === 401) return { ok: false, configured: true, error: "runtime rejected the token" };
+    if (!resp.ok) return { ok: false, configured: true, error: `runtime returned ${resp.status}` };
+    const data = await resp.json();
+    return { ok: true, configured: true, agents: Array.isArray(data.agents) ? data.agents : [] };
+  } catch (error) {
+    return { ok: false, configured: true, error: String(error && error.message ? error.message : error) };
+  }
+}

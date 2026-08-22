@@ -12,6 +12,7 @@
   import ConfirmDialog from "./ConfirmDialog.svelte";
   import DeepCodeModal from "./DeepCodeModal.svelte";
   import RuntimeApprovals from "./RuntimeApprovals.svelte";
+  import AgentStatus from "./AgentStatus.svelte";
   import ApiPlayground from "../api-playground/ApiPlayground.svelte";
   import appState from "../state.js";
 
@@ -170,6 +171,7 @@
 <StatusBanner />
 <AnnouncementBanner />
 <RuntimeApprovals />
+<AgentStatus />
 <PreviewPanel
   visible={previewVisible}
   title={previewTitle}

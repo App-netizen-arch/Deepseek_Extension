@@ -186,7 +186,19 @@
       "advancedSearchPlaceholder": "Ayarlarda ara...",
       "advancedNoResults": "Eşleşen ayar bulunamadı.",
       "disableTipBox": "İpucu Kutusunu Devre Dışı Bırak",
-      "disableTipBoxHint": "Drawer her açıldığında rastgele bir ipucu gösterir."
+      "disableTipBoxHint": "Drawer her açıldığında rastgele bir ipucu gösterir.",
+      "subRuntime": "Yerel Çalışma Zamanı (ajanlar)",
+      "runtimeDescription": "Better DeepSeek'i yerel ajan çalışma zamanına bağlayın. Sohbetten başlatılan ajanlar bu makinede çalışır.",
+      "runtimeUrl": "Çalışma zamanı URL",
+      "runtimeToken": "Çalışma zamanı anahtarı",
+      "runtimeTokenPlaceholder": "setup-token.mjs çıktısını yapıştırın",
+      "runtimeSave": "Kaydet",
+      "runtimeTest": "Bağlantıyı test et",
+      "runtimeTesting": "Test ediliyor…",
+      "runtimeSaved": "Kaydedildi.",
+      "runtimeTokenShort": "Anahtar en az 32 karakter olmalı.",
+      "runtimeReachable": "{service} bağlandı.",
+      "runtimeUnreachable": "Çalışma zamanı erişilemez — çalışıyor mu?"
     },
     "skillList": {
       "title": "Yetenek Seti",

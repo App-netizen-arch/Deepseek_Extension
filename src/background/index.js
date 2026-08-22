@@ -6,7 +6,7 @@ import {
   normalizeGitHubCommitCount,
 } from "../lib/github-commits.js";
 import { devLog } from "../lib/dev-log.js";
-import { listPendingApprovals, decideApproval, listAgents } from "./runtime-client.js";
+import { listPendingApprovals, decideApproval, listAgents, pingRuntime, spawnRuntimeAgent, fetchAgentStatus, cancelRuntimeAgent } from "./runtime-client.js";
 
 export {
   DEFAULT_GITHUB_COMMIT_COUNT,
@@ -187,6 +187,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === "BDS_RUNTIME_AGENTS_LIST") {
     listAgents(message.filters || {})
+      .then((result) => sendResponse(result))
+      .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
+    return true;
+  }
+
+  if (message.type === "BDS_RUNTIME_PING") {
+    pingRuntime()
+      .then((result) => sendResponse(result))
+      .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
+    return true;
+  }
+
+  if (message.type === "BDS_RUNTIME_AGENT_SPAWN") {
+    spawnRuntimeAgent(message.spec || {})
+      .then((result) => sendResponse(result))
+      .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
+    return true;
+  }
+
+  if (message.type === "BDS_RUNTIME_AGENT_STATUS") {
+    fetchAgentStatus(message.agentId)
+      .then((result) => sendResponse(result))
+      .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
+    return true;
+  }
+
+  if (message.type === "BDS_RUNTIME_AGENT_CANCEL") {
+    cancelRuntimeAgent(message.agentId)
       .then((result) => sendResponse(result))
       .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
     return true;

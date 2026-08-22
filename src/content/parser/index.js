@@ -170,6 +170,9 @@ export function parseBdsMessage(rawText, isSettled = false) {
       fileRead: [],
       searchInDirectory: [],
       dirList: [],
+      agentSpawns: [],
+      agentStatus: [],
+      agentCancels: [],
     },
     visibleText: stripAutoLinkArtifacts(text),
   };
@@ -408,6 +411,36 @@ export function parseBdsMessage(rawText, isSettled = false) {
     let argsObj = {};
     try { argsObj = JSON.parse(rawArgs); } catch { argsObj = { _raw: rawArgs.trim() }; }
     result.autoRequests.mcpCalls.push({ serverUrl, toolName, args: argsObj });
+  }
+
+  // Runtime agent bridge (Phase A-F): spawn/status/cancel agents on the
+  // local runtime from chat. Tags are self-closing or pair-tagged; the pair
+  // body becomes the task instruction for spawns.
+  const agentSpawnRegex = /<BDS:AUTO:AGENT_SPAWN\s+((?:[^>"']+|"[^"]*"|'[^']*')*)\s*\/?>(?:([\s\S]*?)<\/BDS:AUTO:AGENT_SPAWN>)?/gi;
+  while ((match = agentSpawnRegex.exec(text)) !== null) {
+    if (isInsideCodeBlock(match.index)) continue;
+    const attrs = parseTagAttributes(match[1] || "");
+    result.autoRequests.agentSpawns.push({
+      name: String(attrs.name || "").trim(),
+      type: String(attrs.type || "demo").trim() || "demo",
+      start: attrs.start,
+      task: String(match[2] || "").trim(),
+    });
+  }
+
+  const agentStatusRegex = /<BDS:AUTO:AGENT_STATUS\s+((?:[^>"']+|"[^"]*"|'[^']*')*)?\s*\/?>/gi;
+  while ((match = agentStatusRegex.exec(text)) !== null) {
+    if (isInsideCodeBlock(match.index)) continue;
+    const attrs = parseTagAttributes((match[1] || "").replace(/\/$/, ""));
+    result.autoRequests.agentStatus.push(String(attrs.id || "").trim());
+  }
+
+  const agentCancelRegex = /<BDS:AUTO:AGENT_CANCEL\s+((?:[^>"']+|"[^"]*"|'[^']*')*)\s*\/?>/gi;
+  while ((match = agentCancelRegex.exec(text)) !== null) {
+    if (isInsideCodeBlock(match.index)) continue;
+    const attrs = parseTagAttributes(match[1] || "");
+    const id = String(attrs.id || "").trim();
+    if (id) result.autoRequests.agentCancels.push(id);
   }
 
   const fileReadRegex = /<BDS:(?:AUTO:)?FILE_READ([^>]*)>(?:([\s\S]*?)<\/BDS:(?:AUTO:)?FILE_READ>)?/gi;

@@ -186,7 +186,19 @@
       "advancedSearchPlaceholder": "Поиск настроек...",
       "advancedNoResults": "Совпадений не найдено.",
       "disableTipBox": "Отключить окно подсказок",
-      "disableTipBoxHint": "Показывает случайную подсказку при каждом открытии панели."
+      "disableTipBoxHint": "Показывает случайную подсказку при каждом открытии панели.",
+      "subRuntime": "Локальный рантайм (агенты)",
+      "runtimeDescription": "Подключите Better DeepSeek к локальному рантайму агентов. Агенты, запущенные из чата, работают на этой машине.",
+      "runtimeUrl": "URL рантайма",
+      "runtimeToken": "Токен рантайма",
+      "runtimeTokenPlaceholder": "вставьте токен из scripts/setup-token.mjs",
+      "runtimeSave": "Сохранить",
+      "runtimeTest": "Проверить связь",
+      "runtimeTesting": "Проверка…",
+      "runtimeSaved": "Сохранено.",
+      "runtimeTokenShort": "Токен должен быть не короче 32 символов.",
+      "runtimeReachable": "Подключено к {service}.",
+      "runtimeUnreachable": "Рантайм недоступен — запущен ли он?"
     },
     "skillList": {
       "title": "Набор навыков",

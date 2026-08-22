@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.3.0",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
@@ -15,7 +17,8 @@
     "better-sqlite3": "^12.4.1",
     "katex": "^0.16.22",
     "playwright": "^1.54.0",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

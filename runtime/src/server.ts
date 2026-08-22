@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { URL } from "node:url";
 import { WebSocketServer, type WebSocket } from "ws";
 import { authenticateBearer } from "./auth.js";
-import { HOST, LIMITS, PORT, TOKEN } from "./config.js";
+import { HOST, LIMITS, PORT, TOKEN, WORKSPACE } from "./config.js";
 import { RuntimeStore } from "./store.js";
 import { ALLOWED_PHASE0_TAGS, type WsEvent, type WsHello } from "./protocol.js";
 import { parseBdsTags, type BdsTag } from "./tag-parser.js";
@@ -15,6 +15,20 @@ import { analyzeMath, type MathAnalyzeRequest } from "./mathbridge.js";
 import { ingestMathPdf } from "./math-document.js";
 import { askMathDocument, type MathAskRequest } from "./math-production.js";
 import { renderTikz } from "./tikz.js";
+import { AgentRegistry, type AgentListFilters } from "./agent/registry.js";
+import { TaskQueue } from "./agent/queue.js";
+import { AgentRunner } from "./agent/runner.js";
+import { createDefaultFactory } from "./agent/demo-agent.js";
+import { ToolRegistry } from "./mcp/registry.js";
+import { ToolInvocationService } from "./mcp/service.js";
+import { createBuiltinTools } from "./mcp/builtin.js";
+import { discoverRemoteTools, type McpRemoteServer } from "./mcp/client.js";
+import { loadAgentConfig } from "./agent-config.js";
+import { log } from "./operational.js";
+import { WorkflowRunner } from "./workflow/runner.js";
+import { findWorkflow, loadWorkflowDefinitions } from "./workflow/loader.js";
+import { getSkillsForAgent, loadSkills, type Skill } from "./agent/skill-loader.js";
+import { PermissionStore } from "./security/permissions.js";
 
 const store = new RuntimeStore();
 const startedAt = Date.now();
@@ -24,6 +38,75 @@ const activeCodeJobs = new Set<Promise<unknown>>();
 const webTaskResults = new Map<string, unknown>();
 const productionTasks = new Set<Promise<unknown>>();
 const SUPPORTED_LANGUAGES = Object.keys(CODE_COMMANDS) as SupportedLanguage[];
+
+const toolRegistry = new ToolRegistry(store);
+for (const tool of createBuiltinTools({
+  allowedHttpDomains: (process.env.BDS_TOOL_ALLOWED_DOMAINS ?? "")
+    .split(",")
+    .map((domain) => domain.trim().toLowerCase())
+    .filter(Boolean),
+})) {
+  toolRegistry.register(tool);
+}
+const permissionStore = new PermissionStore(store.db);
+const toolService = new ToolInvocationService(toolRegistry, store, WORKSPACE, {
+  permissions: permissionStore,
+  onApprovalRequested: (info) => broadcast({ type: "approval/pending", payload: info }),
+});
+const mcpServers = new Map<string, McpRemoteServer>();
+
+const agentRegistry = new AgentRegistry(store.db);
+const agentQueue = new TaskQueue(store.db);
+const agentRunner = new AgentRunner(agentRegistry, agentQueue, createDefaultFactory(), {
+  onEvent: (event) => broadcast({ type: "agent/event", payload: event }),
+  toolInvoker: (caller, toolName, params) => toolService.invoke(caller, toolName, params),
+  skillProvider: () => skillsCache,
+});
+const workflowRunner = new WorkflowRunner(
+  {
+    db: store.db,
+    invokeTool: (caller, toolName, params) => toolService.invoke(caller, toolName, params),
+    agentRunner,
+    agentQueue,
+  },
+  { onEvent: (event) => broadcast({ type: "workflow/event", payload: event }) },
+);
+
+/** Skill cache backing the runner's synchronous skillProvider. */
+let skillsCache: Skill[] = [];
+void loadSkills()
+  .then((skills) => {
+    skillsCache = skills;
+    if (skills.length > 0) log("info", "skills loaded", { count: skills.length });
+  })
+  .catch(() => undefined);
+
+/** Discover and register tools from one MCP server; failures are logged only. */
+async function connectMcpServer(server: McpRemoteServer): Promise<number> {
+  const tools = await discoverRemoteTools(server);
+  for (const tool of tools) toolRegistry.register(tool);
+  mcpServers.set(server.name, server);
+  store.audit("mcp.connected", { server: server.name, tools: tools.length });
+  log("info", "mcp server connected", { server: server.name, tools: tools.length });
+  return tools.length;
+}
+
+// Auto-connect configured MCP servers from .better-deepseek.jsonc (best effort).
+void (async () => {
+  try {
+    const config = await loadAgentConfig();
+    for (const entry of config.mcp) {
+      if (!entry.url || entry.enabled === false) continue;
+      try {
+        await connectMcpServer({ name: entry.name, url: entry.url });
+      } catch (error) {
+        log("warn", "mcp auto-connect failed", { server: entry.name, error: String(error) });
+      }
+    }
+  } catch {
+    // configuration file is optional
+  }
+})();
 
 function json(res: http.ServerResponse, status: number, value: unknown): void {
   const body = JSON.stringify(value);
@@ -96,7 +179,40 @@ export function createRuntimeServer() {
       if (req.method === "POST" && req.url === "/sessions") { const body = JSON.parse(await readBody(req)) as { name?: string }; if (!body.name) { json(res, 400, { ok: false, error: "name is required" }); return; } const session = await createLoginSession(body.name); json(res, 200, { ok: true, session, next: "Complete login in the opened browser, then call POST /sessions/:name/save" }); return; }
       if (req.method === "POST" && req.url?.match(/^\/sessions\/[^/]+\/save$/)) { const name = decodeURIComponent(req.url.slice("/sessions/".length, -"/save".length)); await saveLoginSession(name, store); json(res, 200, { ok: true, name, saved: true }); return; }
       if (req.method === "DELETE" && req.url?.startsWith("/sessions/")) { const name = decodeURIComponent(req.url.slice("/sessions/".length)); const removed = await deleteSession(name, store); json(res, removed ? 200 : 404, { ok: removed, name, deleted: removed }); return; }
+      if (req.method === "GET" && req.url === "/approvals/pending") { json(res, 200, { ok: true, approvals: store.listPendingApprovals() }); return; }
       if (req.method === "POST" && req.url?.match(/^\/approvals\/[^/]+$/)) { const id = decodeURIComponent(req.url.slice("/approvals/".length)); const body = JSON.parse(await readBody(req)) as { decision?: "approved" | "denied" }; if (body.decision !== "approved" && body.decision !== "denied") { json(res, 400, { ok: false, error: "decision must be approved or denied" }); return; } const current = store.getApproval(id); if (!current) { json(res, 404, { ok: false, error: "approval_not_found" }); return; } if (Date.parse(current.expires_at) <= Date.now()) { store.decideApproval(id, "denied"); json(res, 410, { ok: false, error: "approval_expired" }); return; } const decided = store.decideApproval(id, body.decision); json(res, decided ? 200 : 409, { ok: decided, id, decision: body.decision }); return; }
+
+      // ---- Tool registry & invocation ----
+      if (req.method === "GET" && req.url === "/v1/tools") { json(res, 200, { ok: true, tools: toolRegistry.list(), mcp_servers: [...mcpServers.keys()] }); return; }
+      if (req.method === "POST" && req.url?.match(/^\/v1\/tools\/[^/]+\/(enable|disable)$/)) { const match = req.url.match(/^\/v1\/tools\/([^/]+)\/(enable|disable)$/)!; const name = decodeURIComponent(match[1]); try { if (match[2] === "enable") toolRegistry.enable(name); else toolRegistry.disable(name); store.audit(`tool.${match[2]}`, { tool: name }); json(res, 200, { ok: true, tool: name, enabled: match[2] === "enable" }); } catch (error) { json(res, 404, { ok: false, error: error instanceof Error ? error.message : "tool not found" }); } return; }
+      if (req.method === "POST" && req.url === "/v1/tools/invoke") { const body = JSON.parse(await readBody(req)) as { agent_id?: string; tool?: string; params?: Record<string, unknown> }; if (!body.tool) { json(res, 400, { ok: false, error: "tool is required" }); return; } let permissions; if (body.agent_id) { const descriptor = agentRegistry.get(body.agent_id); if (!descriptor) { json(res, 404, { ok: false, error: "agent_not_found" }); return; } permissions = descriptor.permissions; } try { const result = await toolService.invoke({ agentId: body.agent_id ?? "api", ...(permissions !== undefined ? { permissions } : {}) }, body.tool, body.params ?? {}); json(res, 200, { ok: true, result }); } catch (error) { const message = error instanceof Error ? error.message : "invocation failed"; const status = message.startsWith("approval_denied") || message.startsWith("approval_expired") || message.includes("not permitted") || message.includes("disabled") || message.includes("critical risk") ? 403 : 400; json(res, status, { ok: false, error: message }); } return; }
+
+      // ---- MCP servers ----
+      if (req.method === "GET" && req.url === "/v1/mcp/servers") { json(res, 200, { ok: true, servers: [...mcpServers.values()] }); return; }
+      if (req.method === "POST" && req.url === "/v1/mcp/connect") { const body = JSON.parse(await readBody(req)) as { name?: string; url?: string }; if (!body.name || !body.url) { json(res, 400, { ok: false, error: "name and url are required" }); return; } try { const count = await connectMcpServer({ name: body.name, url: body.url }); json(res, 200, { ok: true, server: body.name, tools_registered: count }); } catch (error) { json(res, 502, { ok: false, error: error instanceof Error ? error.message : "mcp connect failed" }); } return; }
+
+      // ---- Permission rules (Phase F) ----
+      if (req.method === "POST" && req.url === "/v1/permissions") { const body = JSON.parse(await readBody(req)) as { agent_id?: string; tool?: string; path_pattern?: string; decision?: "allow" | "deny" | "ask"; ttl_seconds?: number; granted_by?: string }; if (!body.tool || !body.decision) { json(res, 400, { ok: false, error: "tool and decision are required" }); return; } try { const rule = permissionStore.add({ tool: body.tool, decision: body.decision, ...(body.agent_id ? { agentId: body.agent_id } : {}), ...(body.path_pattern ? { pathPattern: body.path_pattern } : {}), ...(typeof body.ttl_seconds === "number" ? { ttlSeconds: body.ttl_seconds } : {}), ...(body.granted_by ? { grantedBy: body.granted_by } : {}) }); store.audit("permission.grant", { id: rule.id, tool: rule.tool, decision: rule.decision, agentId: rule.agentId ?? null }); json(res, 200, { ok: true, rule }); } catch (error) { json(res, 400, { ok: false, error: error instanceof Error ? error.message : "grant failed" }); } return; }
+      if (req.method === "GET" && req.url?.startsWith("/v1/permissions")) { const url = new URL(req.url, `http://${HOST}`); const agentId = url.searchParams.get("agent_id") ?? undefined; const tool = url.searchParams.get("tool") ?? undefined; json(res, 200, { ok: true, rules: permissionStore.list({ ...(agentId ? { agentId } : {}), ...(tool ? { tool } : {}) }) }); return; }
+      if (req.method === "DELETE" && req.url?.match(/^\/v1\/permissions\/[^/]+$/)) { const id = decodeURIComponent(req.url.slice("/v1/permissions/".length)); const removed = permissionStore.revoke(id); store.audit("permission.revoke", { id, removed }); json(res, removed ? 200 : 404, { ok: removed, id }); return; }
+
+      // ---- Skills ----
+      if (req.method === "GET" && req.url === "/v1/skills") { const all = await loadSkills(); json(res, 200, { ok: true, skills: all.map((s) => ({ name: s.name, description: s.description ?? null, version: s.version ?? null, agents: s.appliesTo.length > 0 ? s.appliesTo : ["*"], file: s.file, body_chars: s.body.length })) }); return; }
+      if (req.method === "GET" && req.url?.match(/^\/v1\/skills\/[^/]+$/)) { const name = decodeURIComponent(req.url.slice("/v1/skills/".length)); const all = await loadSkills(); const skill = all.find((s) => s.name === name); if (!skill) { json(res, 404, { ok: false, error: "skill_not_found" }); return; } store.audit("skill.load", { name: skill.name }); json(res, 200, { ok: true, skill: { name: skill.name, description: skill.description ?? null, version: skill.version ?? null, agents: skill.appliesTo.length > 0 ? skill.appliesTo : ["*"], content: skill.body } }); return; }
+      if (req.method === "POST" && req.url === "/v1/skills/reload") { try { skillsCache = await loadSkills(); store.audit("skill.reload", { count: skillsCache.length }); json(res, 200, { ok: true, count: skillsCache.length }); } catch (error) { json(res, 500, { ok: false, error: error instanceof Error ? error.message : "reload failed" }); } return; }
+
+      // ---- Workflow engine ----
+      if (req.method === "GET" && req.url === "/v1/workflows") { const definitions = await loadWorkflowDefinitions(); json(res, 200, { ok: true, workflows: definitions.map((d) => ({ name: d.name, description: d.description ?? null, steps: d.steps.length, file: d.file })) }); return; }
+      if (req.method === "GET" && req.url === "/v1/workflow/runs") { json(res, 200, { ok: true, runs: workflowRunner.listRuns() }); return; }
+      if (req.method === "POST" && req.url === "/v1/workflow/run") { const body = JSON.parse(await readBody(req)) as { name?: string; input?: Record<string, unknown> }; if (!body.name) { json(res, 400, { ok: false, error: "workflow name is required" }); return; } const definition = await findWorkflow(body.name); if (!definition) { json(res, 404, { ok: false, error: `workflow not found: ${body.name}` }); return; } try { const { runId } = workflowRunner.start(definition, body.input ?? {}); store.audit("workflow.run", { runId, name: definition.name }); json(res, 202, { ok: true, run_id: runId, status: "pending" }); } catch (error) { json(res, 400, { ok: false, error: error instanceof Error ? error.message : "workflow start failed" }); } return; }
+      if (req.method === "GET" && req.url?.match(/^\/v1\/workflow\/[^/]+\/status$/)) { const id = decodeURIComponent(req.url.slice("/v1/workflow/".length, -"/status".length)); const record = workflowRunner.get(id); if (!record) { json(res, 404, { ok: false, error: "run_not_found" }); return; } json(res, 200, { ok: true, run: record }); return; }
+      if (req.method === "POST" && req.url?.match(/^\/v1\/workflow\/[^/]+\/cancel$/)) { const id = decodeURIComponent(req.url.slice("/v1/workflow/".length, -"/cancel".length)); const cancelled = workflowRunner.cancel(id); json(res, cancelled ? 200 : 409, { ok: cancelled, run_id: id, ...(cancelled ? {} : { error: "run is not cancellable (unknown or already finished)" }) }); return; }
+
+      // ---- Agent lifecycle ----
+      if (req.method === "POST" && req.url === "/v1/agent/spawn") { const body = JSON.parse(await readBody(req)) as { name?: string; type?: string; permissions?: Record<string, unknown>; permissionsOverride?: Record<string, unknown>; context?: Record<string, unknown>; parentId?: string; projectId?: string; sessionId?: string }; if (!body.name || !body.type) { json(res, 400, { ok: false, error: "name and type are required" }); return; } try { const override = body.permissionsOverride ?? body.permissions; const result = agentRunner.spawn({ name: body.name, type: body.type, ...(override !== undefined ? { permissions: override } : {}), ...(body.context !== undefined ? { context: body.context } : {}), ...(body.parentId ? { parentId: body.parentId } : {}), ...(body.projectId ? { projectId: body.projectId } : {}), ...(body.sessionId ? { sessionId: body.sessionId } : {}) }); store.audit("agent.spawn", { agentId: result.agent.id, type: result.agent.type, parentId: result.agent.parentId ?? null }); json(res, 200, { ok: true, agent: result.agent, ...(result.task ? { task_id: result.task.id } : {}) }); return; } catch (error) { json(res, 409, { ok: false, error: error instanceof Error ? error.message : "spawn failed" }); return; } }
+      if (req.method === "GET" && req.url?.match(/^\/v1\/agents(\?.*)?$/)) { const url = new URL(req.url, `http://${HOST}`); const filters: AgentListFilters = {}; const state = url.searchParams.get("state"); const type = url.searchParams.get("type"); const parentId = url.searchParams.get("parentId"); if (state) filters.state = state as AgentListFilters["state"]; if (type) filters.type = type; if (parentId) filters.parentId = parentId; json(res, 200, { ok: true, agents: agentRegistry.list(filters) }); return; }
+      if (req.method === "GET" && req.url?.match(/^\/v1\/agent\/[^/]+\/status$/)) { const id = decodeURIComponent(req.url.slice("/v1/agent/".length, -"/status".length)); if (!agentRegistry.get(id)) { json(res, 404, { ok: false, error: "agent_not_found" }); return; } json(res, 200, { ok: true, status: agentRunner.status(id) }); return; }
+      if (req.method === "POST" && req.url?.match(/^\/v1\/agent\/[^/]+\/(start|pause|resume|cancel)$/)) { const match = req.url.match(/^\/v1\/agent\/([^/]+)\/(start|pause|resume|cancel)$/)!; const id = decodeURIComponent(match[1]); const action = match[2] as "start" | "pause" | "resume" | "cancel"; if (!agentRegistry.get(id)) { json(res, 404, { ok: false, error: "agent_not_found" }); return; } try { if (action === "start") { const task = agentRunner.start(id); store.audit("agent.start", { agentId: id, taskId: task.id }); json(res, 202, { ok: true, agent_id: id, task_id: task.id }); return; } if (action === "pause") agentRunner.pause(id); if (action === "resume") agentRunner.resume(id); if (action === "cancel") agentRunner.cancel(id); store.audit(`agent.${action}`, { agentId: id }); json(res, 200, { ok: true, agent_id: id }); return; } catch (error) { json(res, 409, { ok: false, error: error instanceof Error ? error.message : `${action} failed` }); return; } }
 
       if (req.method === "POST" && req.url === "/v1/math/analyze") { const body = JSON.parse(await readBody(req)) as MathAnalyzeRequest; const result = await analyzeMath(body, store); json(res, 200, { ok: true, result }); return; }
       if (req.method === "POST" && req.url === "/v1/math/pdf") { const body = JSON.parse(await readBody(req)) as { file?: string }; if (!body.file) { json(res, 400, { ok: false, error: "file is required" }); return; } const result = await ingestMathPdf(body.file, store); json(res, 200, { ok: true, result }); return; }
@@ -126,8 +242,16 @@ export function createRuntimeServer() {
       if (message.type === "math/pdf") { const payload = (message as { payload?: { file?: string } }).payload; if (!payload?.file) throw new Error("file is required"); const result = await ingestMathPdf(payload.file, store); socket.send(JSON.stringify({ type: "math/pdf/result", payload: result } satisfies WsEvent)); return; }
       if (message.type === "math/ask") { const payload = (message as { payload?: MathAskRequest }).payload; if (!payload) throw new Error("missing math ask payload"); const result = await askMathDocument(payload, store); socket.send(JSON.stringify({ type: "math/ask/result", payload: result } satisfies WsEvent)); return; }
       if (message.type === "math/tikz") { const payload = (message as { payload?: { source?: string } }).payload; if (!payload?.source) throw new Error("source is required"); const result = await renderTikz(payload.source); socket.send(JSON.stringify({ type: "math/tikz/result", payload: result } satisfies WsEvent)); return; }
-      if (message.type === "tags") { const payload = (message as { payload?: { text?: string } }).payload ?? {}; const text = typeof payload.text === "string" ? payload.text : ""; const tags = parseBdsTags(text); const unsupported = tags.filter((tag) => !ALLOWED_PHASE0_TAGS.has(tag.name)).map((tag) => tag.name); store.audit("tags.detected", { count: tags.length, unsupported }); socket.send(JSON.stringify({ type: "runtime/tags", payload: { tags, unsupported } } satisfies WsEvent)); const localExec = tags.find((tag) => tag.name === "LOCAL_EXEC"); if (localExec) void executeLocalExecTag(localExec, socket); const webAgent = tags.find((tag) => tag.name === "WEB_AGENT"); if (webAgent) triggerWebTag(webAgent, socket); const mathAnalyze = tags.find((tag) => tag.name === "MATH_ANALYZE"); if (mathAnalyze) { socket.send(JSON.stringify({ type: "math/action-required", payload: { tag: mathAnalyze, message: "Attach the current equation selection with math/analyze." } } satisfies WsEvent)); } const mathPdf = tags.find((tag) => tag.name === "MATH_PDF"); if (mathPdf && typeof mathPdf.attributes.file === "string") { void ingestMathPdf(mathPdf.attributes.file, store).then((result) => socket.send(JSON.stringify({ type: "math/pdf/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "Math PDF ingestion failed" } } satisfies WsEvent))); } const mathAsk = tags.find((tag) => tag.name === "MATH_ASK"); if (mathAsk && typeof mathAsk.attributes.document_id === "string" && typeof mathAsk.attributes.question === "string") { void askMathDocument({ document_id: mathAsk.attributes.document_id, question: mathAsk.attributes.question }, store).then((result) => socket.send(JSON.stringify({ type: "math/ask/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "Math question failed" } } satisfies WsEvent))); } const tikz = tags.find((tag) => tag.name === "TIKZ_RENDER"); if (tikz && typeof tikz.attributes.source === "string") { void renderTikz(tikz.attributes.source).then((result) => socket.send(JSON.stringify({ type: "math/tikz/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "TikZ render failed" } } satisfies WsEvent))); } return; }
+      if (message.type === "tags") { const payload = (message as { payload?: { text?: string } }).payload ?? {}; const text = typeof payload.text === "string" ? payload.text : ""; const tags = parseBdsTags(text); const unsupported = tags.filter((tag) => !ALLOWED_PHASE0_TAGS.has(tag.name)).map((tag) => tag.name); store.audit("tags.detected", { count: tags.length, unsupported }); socket.send(JSON.stringify({ type: "runtime/tags", payload: { tags, unsupported } } satisfies WsEvent)); const localExec = tags.find((tag) => tag.name === "LOCAL_EXEC"); if (localExec) void executeLocalExecTag(localExec, socket); const webAgent = tags.find((tag) => tag.name === "WEB_AGENT"); if (webAgent) triggerWebTag(webAgent, socket); const mathAnalyze = tags.find((tag) => tag.name === "MATH_ANALYZE"); if (mathAnalyze) { socket.send(JSON.stringify({ type: "math/action-required", payload: { tag: mathAnalyze, message: "Attach the current equation selection with math/analyze." } } satisfies WsEvent)); } const mathPdf = tags.find((tag) => tag.name === "MATH_PDF"); if (mathPdf && typeof mathPdf.attributes.file === "string") { void ingestMathPdf(mathPdf.attributes.file, store).then((result) => socket.send(JSON.stringify({ type: "math/pdf/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "Math PDF ingestion failed" } } satisfies WsEvent))); } const mathAsk = tags.find((tag) => tag.name === "MATH_ASK"); if (mathAsk && typeof mathAsk.attributes.document_id === "string" && typeof mathAsk.attributes.question === "string") { void askMathDocument({ document_id: mathAsk.attributes.document_id, question: mathAsk.attributes.question }, store).then((result) => socket.send(JSON.stringify({ type: "math/ask/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "Math question failed" } } satisfies WsEvent))); } const tikz = tags.find((tag) => tag.name === "TIKZ_RENDER"); if (tikz && typeof tikz.attributes.source === "string") { void renderTikz(tikz.attributes.source).then((result) => socket.send(JSON.stringify({ type: "math/tikz/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "TikZ render failed" } } satisfies WsEvent))); } const skillLoad = tags.find((tag) => tag.name === "SKILL_LOAD"); if (skillLoad && typeof skillLoad.attributes.name === "string") { void loadSkills().then((all) => all.find((s) => s.name === skillLoad.attributes.name)).then((skill) => socket.send(JSON.stringify(skill ? { type: "skill/loaded", payload: { name: skill.name, description: skill.description ?? null, version: skill.version ?? null, content: skill.body } } : { type: "runtime/error", payload: { message: `skill not found: ${String(skillLoad.attributes.name)}` } } satisfies WsEvent))); } return; }
       if (message.type === "code/execute") { const payload = (message as { payload?: LocalExecRequest }).payload; if (!payload) throw new Error("missing code execution payload"); if (!SUPPORTED_LANGUAGES.includes(payload.language as SupportedLanguage)) throw new Error("language is not allowlisted"); if (!store.isLanguageEnabled(payload.language)) throw new Error(`language ${payload.language} is disabled`); if (activeCodeJobs.size + activeWebTaskCount() + productionTasks.size >= LIMITS.maxConcurrentJobs) throw new Error("maximum concurrent background jobs reached"); const job = executeLocalCode(payload, store); activeCodeJobs.add(job); job.then((result) => socket.send(JSON.stringify({ type: "code/result", payload: result } satisfies WsEvent))).catch((error) => socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "code execution failed" } } satisfies WsEvent))).finally(() => activeCodeJobs.delete(job)); return; }
+      if (message.type === "agent/spawn") { const payload = (message as { payload?: { name?: string; type?: string; permissions?: Record<string, unknown>; permissionsOverride?: Record<string, unknown>; context?: Record<string, unknown>; parentId?: string; projectId?: string; sessionId?: string; task?: Record<string, unknown> } }).payload; if (!payload?.name || !payload.type) throw new Error("agent spawn requires name and type"); const override = payload.permissionsOverride ?? payload.permissions; const result = agentRunner.spawn({ name: payload.name, type: payload.type, ...(override !== undefined ? { permissions: override } : {}), ...(payload.context !== undefined ? { context: payload.context } : {}), ...(payload.parentId ? { parentId: payload.parentId } : {}), ...(payload.projectId ? { projectId: payload.projectId } : {}), ...(payload.sessionId ? { sessionId: payload.sessionId } : {}) }, payload.task !== undefined ? { task: payload.task } : {}); store.audit("agent.spawn", { agentId: result.agent.id, type: result.agent.type, parentId: result.agent.parentId ?? null, via: "ws" }); socket.send(JSON.stringify({ type: "agent/event", requestId: (message as { requestId?: string }).requestId, payload: { kind: "spawned", agentId: result.agent.id, state: result.agent.state, ...(result.task ? { taskId: result.task.id } : {}) } } satisfies WsEvent)); return; }
+      if (message.type === "agent/start") { const id = String((message as { payload?: { agent_id?: string } }).payload?.agent_id ?? ""); if (!agentRegistry.get(id)) throw new Error(`agent ${id} does not exist`); const task = agentRunner.start(id); store.audit("agent.start", { agentId: id, taskId: task.id, via: "ws" }); socket.send(JSON.stringify({ type: "agent/event", requestId: (message as { requestId?: string }).requestId, payload: { kind: "start_requested", agentId: id, taskId: task.id } } satisfies WsEvent)); return; }
+      if (message.type === "agent/pause" || message.type === "agent/resume" || message.type === "agent/cancel") { const id = String((message as { payload?: { agent_id?: string } }).payload?.agent_id ?? ""); if (!agentRegistry.get(id)) throw new Error(`agent ${id} does not exist`); if (message.type === "agent/pause") agentRunner.pause(id); if (message.type === "agent/resume") agentRunner.resume(id); if (message.type === "agent/cancel") agentRunner.cancel(id); store.audit(message.type.replace("/", "."), { agentId: id, via: "ws" }); return; }
+      if (message.type === "agent/status") { const id = String((message as { payload?: { agent_id?: string } }).payload?.agent_id ?? ""); if (!agentRegistry.get(id)) throw new Error(`agent ${id} does not exist`); socket.send(JSON.stringify({ type: "agent/status", requestId: (message as { requestId?: string }).requestId, payload: agentRunner.status(id) } satisfies WsEvent)); return; }
+      if (message.type === "tools/list") { socket.send(JSON.stringify({ type: "tool/list", requestId: (message as { requestId?: string }).requestId, payload: { tools: toolRegistry.list(), mcp_servers: [...mcpServers.keys()] } } satisfies WsEvent)); return; }
+      if (message.type === "tools/invoke") { const payload = (message as { payload?: { agent_id?: string; tool?: string; params?: Record<string, unknown> } }).payload; if (!payload?.tool) throw new Error("tool is required"); let permissions; if (payload.agent_id) { const descriptor = agentRegistry.get(payload.agent_id); if (!descriptor) throw new Error(`agent ${payload.agent_id} does not exist`); permissions = descriptor.permissions; } const result = await toolService.invoke({ agentId: payload.agent_id ?? "ws", ...(permissions !== undefined ? { permissions } : {}) }, payload.tool, payload.params ?? {}); socket.send(JSON.stringify({ type: "tool/result", requestId: (message as { requestId?: string }).requestId, payload: { ok: true, result } } satisfies WsEvent)); return; }
+      if (message.type === "workflow/run") { const payload = (message as { payload?: { name?: string; input?: Record<string, unknown> } }).payload; if (!payload?.name) throw new Error("workflow name is required"); const definition = await findWorkflow(payload.name); if (!definition) throw new Error(`workflow not found: ${payload.name}`); const { runId } = workflowRunner.start(definition, payload.input ?? {}); socket.send(JSON.stringify({ type: "workflow/event", requestId: (message as { requestId?: string }).requestId, payload: { kind: "run_started", runId } } satisfies WsEvent)); return; }
+      if (message.type === "workflow/cancel") { const runId = String((message as { payload?: { run_id?: string } }).payload?.run_id ?? ""); const cancelled = workflowRunner.cancel(runId); socket.send(JSON.stringify({ type: "workflow/event", requestId: (message as { requestId?: string }).requestId, payload: { kind: cancelled ? "run_cancelled" : "run_failed", runId, detail: cancelled ? undefined : "not cancellable" } } satisfies WsEvent)); return; }
       store.audit("ws.message.unsupported", { type: message.type }); socket.send(JSON.stringify({ type: "runtime/error", payload: { message: `unsupported message: ${message.type}` } } satisfies WsEvent));
     } catch (error) { socket.send(JSON.stringify({ type: "runtime/error", payload: { message: error instanceof Error ? error.message : "invalid message" } } satisfies WsEvent)); } }); socket.on("close", () => { clearTimeout(timeout); clients.delete(socket); }); });
   server.on("upgrade", (req, socket, head) => { const url = new URL(req.url ?? "/", `http://${HOST}`); if (url.pathname !== "/ws") { socket.destroy(); return; } wsServer.handleUpgrade(req, socket, head, (ws) => wsServer.emit("connection", ws, req)); });

@@ -175,3 +175,174 @@ POST   /sessions/:name/save
 DELETE /sessions/:name
 WS     /ws
 ```
+
+## Agent Core (Phase A)
+
+The agent orchestration layer lives in `src/agent/` and persists through the shared SQLite database (migration v4: `agents`, `tasks`).
+
+### Components
+
+| Module | Role |
+|---|---|
+| `agent/agent.ts` | `AgentState` machine (`created → planning → running → completed/failed/cancelled`, plus `waiting_approval` and `paused`), `AgentPermissions`, `AgentDescriptor`, abstract `Agent` base class with cooperative cancellation (`signal`). |
+| `agent/registry.ts` | SQLite CRUD for agents: `register`, `get`, `list(filters)`, `update`, `delete` (leaf-first), `listChildren`. |
+| `agent/queue.ts` | Durable task queue: priority 1–10 (10 = highest, oldest first), transactional claim, `ack`/`nack` (bounded retries) /`requeue`/`failTask`, per-agent cancel. Capacity limited by `SECURITY_LIMITS.maxQueueDepth`. |
+| `agent/runner.ts` | Drives the lifecycle: claims tasks, launches agent instances, mirrors every state change to the registry, emits events, enforces concurrency. Owns subagent spawning and recursive cancellation. |
+| `agent/permissions.ts` | Subagent permission inheritance: tool lists intersect, limits take the minimum (`DEFAULT_MAX_SUBAGENTS=4`, `MAX_SUBAGENT_DEPTH=3`). |
+| `mcp/tool.ts` | Tool contract: name, description, JSON-schema parameters, risk tier (`low`/`medium`/`high`/`critical`), execute. |
+| `mcp/builtin.ts` | Built-in tools wrapping the hardened code-production helpers (workspace confinement, secret denial, process allowlist). |
+| `mcp/registry.ts` | Tool registry with enable/disable persisted in SQLite (`runtime_meta`). |
+| `mcp/service.ts` | Invocation gate: registry -> enabled -> agent tool list -> shared risk policy; `high` blocks on an expiring approval, `critical` is denied. |
+| `mcp/client.ts` | Minimal MCP streamable-HTTP client (`initialize`, `tools/list`, `tools/call`); remote tools register under `mcp_<server>_<tool>` and pass through the same permission pipeline. |
+| `workflow/loader.ts` | Parses/validates `.yml`/`.yaml`/`.json` definitions from `<workspace>/.better-deepseek/workflows` (or `BDS_WORKFLOWS_DIR`): DAG checks, duplicate ids, cycles. |
+| `workflow/template.ts` | `{{path}}` interpolation over `{ input, ...stepsById }`; whole-string templates preserve value types, embedded ones stringify. |
+| `workflow/runner.ts` | Durable run engine (migration v5 `workflow_runs`): DAG scheduling with bounded concurrency, per-step retries/timeouts, `when` guards, `continue_on_error`, cancellation cascading through the supervisor agent. |
+| `agent/skill-loader.ts` | Skills (`SKILL.md` with YAML frontmatter: name/description/version/agents) discovered recursively under `<workspace>/.better-deepseek/skills` (`BDS_SKILLS_DIR`); matching skills are recorded in the agent's persisted `context.skills` and composed into its system prompt at launch. |
+| `security/permissions.ts` | Permission rule engine (migration v6 `permissions`): expiring per-agent/tool/resource-glob rules with deny > ask > allow precedence; explicit `allow` is the only way CRITICAL tools run. |
+| `scripts/bds.mjs` | CLI: `node scripts/bds.mjs skill add <file>` copies a skill into the skills directory; `skill list` prints discovered skills. |
+| `agent/demo-agent.ts` | `demo` type — logs "Hello, I am agent X" and completes; reference implementation for new types. |
+
+New agent types implement `doPlan`/`doExecute` and register in `createDefaultFactory()`. Agents invoke tools inside their execution hooks via `this.callTool(name, params)`.
+
+### REST API
+
+All routes require the bearer token.
+
+```text
+POST /v1/agent/spawn            { name, type, permissionsOverride?, context?, parentId?, projectId?, sessionId?, task? }
+POST /v1/agent/:id/start        -> 202 { agent_id, task_id }
+POST /v1/agent/:id/pause
+POST /v1/agent/:id/resume
+POST /v1/agent/:id/cancel       (cancels the whole subagent subtree)
+GET  /v1/agent/:id/status       -> { status: { agent, currentTask?, recentTasks[], children[] } }
+GET  /v1/agents?state=&type=&parentId=
+```
+
+### Subagents
+
+- `parentId` makes the new agent a subagent: it inherits the parent's `projectId`/`sessionId` unless explicitly overridden.
+- `permissionsOverride` is clamped to the parent envelope — tool lists intersect, `maxSubagents` takes the minimum. Overrides can never expand capability.
+- A parent rejects further children once its `maxSubagents` budget (default 4) is exhausted, and spawning below depth 3 is refused.
+- Spawning under a terminal (completed/failed/cancelled) parent is rejected.
+- Cancelling an agent cancels its entire descendant subtree; cancellation never flows upward.
+- Passing `task` on spawn enqueues a bootstrap task payload immediately.
+
+### Tools & MCP
+
+Built-in tools (risk tier in parentheses): `fs_read` (low), `fs_write` (medium), `fs_edit` (medium), `shell_run` (high, allowlisted executables only), `git_status` (low), `git_diff` (low), `git_commit` (high), `http_request` (medium, domain allowlist via `BDS_TOOL_ALLOWED_DOMAINS`, redirects not followed).
+
+```text
+GET  /v1/tools                     -> tool descriptors + mcp server list
+POST /v1/tools/:name/enable
+POST /v1/tools/:name/disable
+POST /v1/tools/invoke              { agent_id?, tool, params }  (403 on denied/expired approval)
+GET  /approvals/pending            -> unresolved approvals (tool + task actions)
+POST /approvals/:id                { decision: "approved" | "denied" }
+GET  /v1/mcp/servers               -> connected MCP servers
+POST /v1/mcp/connect               { name, url }
+WS   tools/list | tools/invoke     -> tool/list | tool/result
+```
+
+Enforcement order for every call: registry existence -> enabled flag -> agent's `permissions.tools` list -> shared risk policy. `high` tools create an expiring approval (default 5 minutes, `BDS_TOOL_APPROVAL_TTL_MS` to override) and block until a decision arrives over REST/WS; expired approvals are auto-denied and audited.
+
+MCP servers configured in `.better-deepseek.jsonc` (`mcp: [{ name, url, enabled }]`) are auto-connected at startup; failures are logged and non-fatal. Remote tools inherit the server's risk tier (default medium).
+
+### Workflows
+
+Definitions live in `<workspace>/.better-deepseek/workflows/*.yml|json` (override with `BDS_WORKFLOWS_DIR`). Steps may be `tool` (registry tool through the permission pipeline) or `agent` (spawns a subagent under a per-run supervisor, so run cancellation cancels the whole subtree).
+
+```yaml
+name: Research and Summarize
+description: Search web, extract, summarize.
+steps:
+  - id: search
+    type: tool
+    tool: web_search
+    params: { query: "{{input.topic}}" }
+  - id: extract
+    type: tool
+    tool: fs_read          # any registered tool
+    depends_on: [search]
+    params: { path: "{{search.result.path}}" }
+  - id: summarize
+    type: agent            # agent TYPE (e.g. demo); params become its task payload
+    agent: demo
+    depends_on: [extract]
+    retries: 2             # retry budget for transient failures
+    when: "{{extract.result.content}}"   # skip step when falsy
+    timeout_ms: 60000      # hard per-step deadline (default 120000)
+    continue_on_error: true              # dependents still run if this fails
+```
+
+Semantics: steps without `depends_on` run in declared order; independent ready steps launch concurrently (per-run cap 4). A failed step fails the run unless every dependent is released via `continue_on_error`; dependents of unreleased failures are `skipped`. Templates resolve against `{ input, ...stepsById }` (`{{input.x}}`, `{{stepid.result.y}}`, or `{{steps.stepid.result.y}}`).
+
+```text
+GET  /v1/workflows                 -> available definitions
+POST /v1/workflow/run              { name, input } -> 202 { run_id }
+GET  /v1/workflow/:id/status       -> full run record (status + per-step states)
+GET  /v1/workflow/runs             -> recent runs
+POST /v1/workflow/:id/cancel       -> cancels run + supervisor subtree (200/409)
+WS   workflow/run | workflow/cancel -> workflow/event broadcasts
+```
+
+Run states: `pending -> running -> completed | failed | cancelled`. Step states: `pending -> running -> completed | failed | skipped`.
+
+### Skills
+
+Skills are `SKILL.md` Markdown files with YAML frontmatter, discovered recursively under the skills root:
+
+```md
+---
+name: Python Best Practices
+description: Style and idioms for generated Python code.
+version: 1.2.0
+agents: demo, worker        # optional; omit or "*" = every agent type
+---
+Body content injected into the agent system prompt.
+```
+
+- At spawn time, applicable skills are recorded in the agent's persisted `context.skills` array (metadata) and their bodies are composed into the instance's system prompt at launch (`<skill name="...">` sections).
+- The runner accepts a synchronous `skillProvider`; the server backs it with a cache loaded at startup.
+
+```text
+GET  /v1/skills              -> discovered skills (metadata)
+GET  /v1/skills/:name        -> full skill content (BDS:SKILL_LOAD equivalent)
+POST /v1/skills/reload       -> refresh the runtime skill cache
+WS    tags text="<BDS:SKILL_LOAD name=...>" -> skill/loaded | runtime/error
+CLI  node scripts/bds.mjs skill add <file> | skill list
+```
+
+### Permissions & Approvals
+
+Every tool invocation passes: registry -> enabled -> agent tool list -> **permission rules** -> default risk tier.
+
+- Rules (`POST /v1/permissions`): `{ tool, decision, agent_id?, path_pattern?, ttl_seconds?, granted_by? }`. Matching uses exact tool (or `*`), agent scope (unset = global), and glob resources (`src/**/*.rs`) extracted from `params.path` / `params.url`.
+- Precedence among matching rules is deny > ask > allow; expired rules are pruned lazily.
+- `allow` pre-consents HIGH actions and is the only way CRITICAL tools execute; `ask` forces approval even for LOW/MEDIUM; unmatched requests fall back to the shared risk policy.
+- HIGH/asked calls create a five-minute approval (`BDS_TOOL_APPROVAL_TTL_MS` overrides) that blocks the caller until decided; expired approvals auto-deny.
+
+```text
+GET    /approvals/pending        -> unresolved approvals (also pushed as WS approval/pending)
+POST   /approvals/:id            { decision: "approved" | "denied" }
+GET    /v1/permissions?agent_id=&tool=
+POST   /v1/permissions
+DELETE /v1/permissions/:id
+```
+
+The extension renders pending approvals as cards in chat (`RuntimeApprovals.svelte`, polled through the service worker via `chrome.runtime.sendMessage`; configure `bdsRuntimeUrl` / `bdsRuntimeToken` in extension storage).
+
+### WebSocket commands
+
+Authenticated clients send `{ type, payload }`; lifecycle events broadcast as `agent/event`, status replies as `agent/status`.
+
+```text
+agent/spawn | agent/start | agent/pause | agent/resume | agent/cancel | agent/status
+```
+
+### Semantics
+
+- `start` is rejected for terminal or already-running/planning agents.
+- Paused agents keep queued tasks parked; `resume` releases them.
+- `cancel` aborts in-flight work via the agent's signal and cancels all its non-terminal tasks (`cancelled`, never retried).
+- Failed attempts retry up to `maxRetries` (default 3), then the task and agent end `failed`.
+- Deterministic launch failures (unknown type) fail immediately without consuming retries.

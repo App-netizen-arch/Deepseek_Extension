@@ -3,12 +3,20 @@ export const BDS_PROTOCOL_VERSION = 1 as const;
 export type BdsRequestKind =
   | "status" | "tags" | "ping" | "code/execute" | "web/start" | "web/cancel"
   | "web/production/start" | "web/production/pause" | "web/production/resume" | "web/production/cancel"
-  | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz";
+  | "math/analyze" | "math/pdf" | "math/ask" | "math/tikz"
+  | "agent/spawn" | "agent/start" | "agent/pause" | "agent/resume" | "agent/cancel" | "agent/status"
+  | "tools/list" | "tools/invoke"
+  | "workflow/run" | "workflow/cancel";
 
 export type BdsEventKind =
   | "runtime/status" | "runtime/tags" | "runtime/error" | "runtime/pong" | "code/result"
   | "web/event" | "web/production" | "math/result" | "math/pdf/result" | "math/ask/result"
-  | "math/tikz/result" | "math/action-required";
+  | "math/tikz/result" | "math/action-required"
+  | "agent/event" | "agent/status"
+  | "tool/result" | "tool/list"
+  | "workflow/event"
+  | "skill/loaded"
+  | "approval/pending";
 
 export interface BdsRequestEnvelope<T = unknown> {
   version: typeof BDS_PROTOCOL_VERSION;

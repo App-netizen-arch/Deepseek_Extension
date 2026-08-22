@@ -12,6 +12,7 @@ import { SECURITY_LIMITS } from "../security-policy.js";
 import type { Agent, AgentDescriptor, AgentPermissions, AgentSpawnSpec, AgentState } from "./agent.js";
 import type { AgentFactory } from "./demo-agent.js";
 import { agentDepth, DEFAULT_MAX_SUBAGENTS, MAX_SUBAGENT_DEPTH, restrictPermissions } from "./permissions.js";
+import { buildSystemPrompt, skillAppliesTo, type Skill } from "./skill-loader.js";
 import type { AgentRegistry } from "./registry.js";
 import type { TaskQueue, TaskRecord } from "./queue.js";
 
@@ -53,6 +54,13 @@ export interface RunnerOptions {
     toolName: string,
     params: Record<string, unknown>,
   ) => Promise<unknown>;
+  /**
+   * Skill source consulted at spawn time (synchronous, backed by an
+   * in-memory cache refreshed via `POST /v1/skills/reload`). Matching skills
+   * are recorded in the agent's persisted `context.skills` array and their
+   * bodies composed into the instance's system prompt at launch.
+   */
+  skillProvider?: () => readonly Skill[];
 }
 
 interface LiveEntry {
@@ -94,6 +102,9 @@ export class AgentRunner {
   private readonly concurrency: number;
   private readonly onEvent?: AgentEventListener;
   private readonly toolInvoker?: NonNullable<RunnerOptions["toolInvoker"]>;
+  private readonly skillProvider?: NonNullable<RunnerOptions["skillProvider"]>;
+  /** Skills resolved during spawn, consumed by launch for prompt injection. */
+  private readonly spawnedSkills = new Map<string, readonly Skill[]>();
   private ticking = false;
   private pendingOperations = 0;
   private readonly idleWaiters: Array<() => void> = [];
@@ -107,6 +118,7 @@ export class AgentRunner {
     this.concurrency = Math.max(1, Math.min(options.concurrency ?? SECURITY_LIMITS.maxConcurrentJobs, 32));
     this.onEvent = options.onEvent;
     this.toolInvoker = options.toolInvoker;
+    this.skillProvider = options.skillProvider;
   }
 
   private emit(event: AgentEvent): void {
@@ -159,7 +171,24 @@ export class AgentRunner {
         permissions: restrictPermissions(parent.permissions, effective.permissions),
       };
     }
+    // Phase E: record applicable skills in the persisted context (metadata
+    // only; full bodies are composed into the instance system prompt).
+    let resolvedSkills: readonly Skill[] = [];
+    if (this.skillProvider && effective.context?.skills === undefined) {
+      try {
+        resolvedSkills = this.skillProvider().filter((skill) => skillAppliesTo(skill, effective.type));
+        if (resolvedSkills.length > 0) {
+          effective = {
+            ...effective,
+            context: { ...(effective.context ?? {}), skills: resolvedSkills.map((s) => ({ name: s.name, version: s.version ?? null })) },
+          };
+        }
+      } catch (error) {
+        log("warn", "skill resolution failed", { type: effective.type, error: String(error) });
+      }
+    }
     const agent = this.registry.register(effective);
+    if (resolvedSkills.length > 0) this.spawnedSkills.set(agent.id, resolvedSkills);
     this.emit({ kind: "spawned", agentId: agent.id, state: agent.state });
     log("info", "agent spawned", {
       agentId: agent.id,
@@ -359,6 +388,11 @@ export class AgentRunner {
           params,
         ),
       );
+    }
+    const skills = this.spawnedSkills.get(agent.id);
+    if (skills && skills.length > 0) {
+      agent.attachSystemPrompt(buildSystemPrompt(`You are agent "${descriptor.name}" of type "${descriptor.type}".`, skills), skills.map((s) => s.name));
+      this.spawnedSkills.delete(agent.id);
     }
     const promise = this.runTask(agent, task);
     this.live.set(agent.id, { agent, task, promise });

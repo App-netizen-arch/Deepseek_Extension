@@ -197,6 +197,8 @@ The agent orchestration layer lives in `src/agent/` and persists through the sha
 | `workflow/loader.ts` | Parses/validates `.yml`/`.yaml`/`.json` definitions from `<workspace>/.better-deepseek/workflows` (or `BDS_WORKFLOWS_DIR`): DAG checks, duplicate ids, cycles. |
 | `workflow/template.ts` | `{{path}}` interpolation over `{ input, ...stepsById }`; whole-string templates preserve value types, embedded ones stringify. |
 | `workflow/runner.ts` | Durable run engine (migration v5 `workflow_runs`): DAG scheduling with bounded concurrency, per-step retries/timeouts, `when` guards, `continue_on_error`, cancellation cascading through the supervisor agent. |
+| `agent/skill-loader.ts` | Skills (`SKILL.md` with YAML frontmatter: name/description/version/agents) discovered recursively under `<workspace>/.better-deepseek/skills` (`BDS_SKILLS_DIR`); matching skills are recorded in the agent's persisted `context.skills` and composed into its system prompt at launch. |
+| `scripts/bds.mjs` | CLI: `node scripts/bds.mjs skill add <file>` copies a skill into the skills directory; `skill list` prints discovered skills. |
 | `agent/demo-agent.ts` | `demo` type — logs "Hello, I am agent X" and completes; reference implementation for new types. |
 
 New agent types implement `doPlan`/`doExecute` and register in `createDefaultFactory()`. Agents invoke tools inside their execution hooks via `this.callTool(name, params)`.
@@ -283,6 +285,31 @@ WS   workflow/run | workflow/cancel -> workflow/event broadcasts
 ```
 
 Run states: `pending -> running -> completed | failed | cancelled`. Step states: `pending -> running -> completed | failed | skipped`.
+
+### Skills
+
+Skills are `SKILL.md` Markdown files with YAML frontmatter, discovered recursively under the skills root:
+
+```md
+---
+name: Python Best Practices
+description: Style and idioms for generated Python code.
+version: 1.2.0
+agents: demo, worker        # optional; omit or "*" = every agent type
+---
+Body content injected into the agent system prompt.
+```
+
+- At spawn time, applicable skills are recorded in the agent's persisted `context.skills` array (metadata) and their bodies are composed into the instance's system prompt at launch (`<skill name="...">` sections).
+- The runner accepts a synchronous `skillProvider`; the server backs it with a cache loaded at startup.
+
+```text
+GET  /v1/skills              -> discovered skills (metadata)
+GET  /v1/skills/:name        -> full skill content (BDS:SKILL_LOAD equivalent)
+POST /v1/skills/reload       -> refresh the runtime skill cache
+WS    tags text="<BDS:SKILL_LOAD name=...>" -> skill/loaded | runtime/error
+CLI  node scripts/bds.mjs skill add <file> | skill list
+```
 
 ### WebSocket commands
 

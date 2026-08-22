@@ -26,7 +26,7 @@ export class DemoAgent extends Agent {
     assertNotAborted(this);
     const message = `Hello, I am agent ${this.name}`;
     log("info", "agent hello", { agentId: this.id, taskId: task.id, type: this.type, message });
-    return { message, taskId: task.id };
+    return { message, taskId: task.id, ...(this.promptSkills.length > 0 ? { skills: [...this.promptSkills] } : {}) };
   }
 }
 

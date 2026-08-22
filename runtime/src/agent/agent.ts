@@ -157,6 +157,7 @@ export abstract class Agent {
   private currentState: AgentState;
   private readonly abortController = new AbortController();
   private toolInvoker?: ToolInvoker;
+  private attachedPrompt?: { text: string; skillNames: readonly string[] };
 
   constructor(descriptor: AgentDescriptor) {
     this.id = descriptor.id;
@@ -187,6 +188,24 @@ export abstract class Agent {
   /** Attach the runtime tool pipeline. Called by the runner at launch. */
   attachToolInvoker(invoker: ToolInvoker): void {
     this.toolInvoker = invoker;
+  }
+
+  /**
+   * Attach a composed system prompt (base instructions + skill bodies).
+   * Called by the runner at launch when skills apply to this agent type.
+   */
+  attachSystemPrompt(text: string, skillNames: readonly string[] = []): void {
+    this.attachedPrompt = { text, skillNames };
+  }
+
+  /** The composed system prompt, when one was attached. */
+  get systemPrompt(): string | undefined {
+    return this.attachedPrompt?.text;
+  }
+
+  /** Names of the skills injected into {@link systemPrompt}. */
+  get promptSkills(): readonly string[] {
+    return this.attachedPrompt?.skillNames ?? [];
   }
 
   /**

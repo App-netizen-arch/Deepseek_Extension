@@ -14,7 +14,8 @@ export type BdsEventKind =
   | "math/tikz/result" | "math/action-required"
   | "agent/event" | "agent/status"
   | "tool/result" | "tool/list"
-  | "workflow/event";
+  | "workflow/event"
+  | "skill/loaded";
 
 export interface BdsRequestEnvelope<T = unknown> {
   version: typeof BDS_PROTOCOL_VERSION;

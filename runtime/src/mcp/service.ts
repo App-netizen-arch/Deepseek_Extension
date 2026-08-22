@@ -9,6 +9,7 @@
 import { randomUUID } from "node:crypto";
 import { log } from "../operational.js";
 import { policyDecision } from "../security-policy.js";
+import { checkPermission, type PermissionStore } from "../security/permissions.js";
 import type { RuntimeStore } from "../store.js";
 import type { AgentPermissions } from "../agent/agent.js";
 import type { ToolRegistry } from "./registry.js";
@@ -30,6 +31,10 @@ export interface ToolServiceOptions {
   approvalTtlMs?: number;
   /** Approval polling interval in ms (default 200). */
   pollMs?: number;
+  /** Permission rule store; rules override the default risk policy per agent/tool/glob. */
+  permissions?: PermissionStore;
+  /** Notified whenever a new pending approval is created (for WS push). */
+  onApprovalRequested?: (info: { id: string; agentId: string; tool: string; target: string; expiresAt: string }) => void;
 }
 
 const DEFAULT_TTL_MS = 5 * 60_000;
@@ -38,6 +43,8 @@ const DEFAULT_POLL_MS = 200;
 export class ToolInvocationService {
   private readonly approvalTtlMs: number;
   private readonly pollMs: number;
+  private readonly permissions?: PermissionStore;
+  private readonly onApprovalRequested?: NonNullable<ToolServiceOptions["onApprovalRequested"]>;
 
   constructor(
     private readonly registry: ToolRegistry,
@@ -48,6 +55,8 @@ export class ToolInvocationService {
   ) {
     this.approvalTtlMs = Math.max(1000, options.approvalTtlMs ?? DEFAULT_TTL_MS);
     this.pollMs = Math.max(25, options.pollMs ?? DEFAULT_POLL_MS);
+    this.permissions = options.permissions;
+    this.onApprovalRequested = options.onApprovalRequested;
   }
 
   /**
@@ -66,12 +75,32 @@ export class ToolInvocationService {
       throw new Error(`tool ${toolName} is not permitted for agent ${caller.agentId}`);
     }
 
-    const decision = policyDecision(tool.permissionLevel);
-    if (decision === "deny") {
+    // Phase F: explicit permission rules take precedence over the default
+    // risk policy. `deny` blocks, `allow` pre-consents (the only way a
+    // critical tool may run), `ask` forces approval even for low/medium.
+    const resource = typeof (params as Record<string, unknown> | null | undefined)?.path === "string"
+      ? String((params as Record<string, unknown>).path)
+      : typeof (params as Record<string, unknown> | null | undefined)?.url === "string"
+        ? String((params as Record<string, unknown>).url)
+        : undefined;
+    const ruleDecision = this.permissions
+      ? checkPermission(this.permissions.list({ agentId: caller.agentId, tool: toolName }), {
+          agentId: caller.agentId,
+          tool: toolName,
+          ...(resource !== undefined ? { resource } : {}),
+        })
+      : undefined;
+    if (ruleDecision === "deny") {
+      this.store.audit("tool.denied", { agentId: caller.agentId, tool: toolName, reason: "permission rule" });
+      throw new Error(`tool ${toolName} is denied by permission rule for agent ${caller.agentId}`);
+    }
+
+    let requiresApproval = ruleDecision ? ruleDecision === "ask" : policyDecision(tool.permissionLevel) === "ask";
+    if (!ruleDecision && tool.permissionLevel === "critical" && policyDecision("critical") === "deny") {
       this.store.audit("tool.denied", { agentId: caller.agentId, tool: toolName, reason: "critical risk tier" });
       throw new Error(`tool ${toolName} is critical risk and cannot be executed`);
     }
-    if (decision === "ask") {
+    if (requiresApproval) {
       await this.requestApproval(caller, toolName, params);
     }
 
@@ -106,6 +135,11 @@ export class ToolInvocationService {
     this.store.createApproval(id, caller.taskId ?? caller.agentId, `tool:${toolName}`, JSON.stringify(params ?? {}).slice(0, 512), expiresAt);
     this.store.audit("tool.approval.requested", { approval_id: id, agentId: caller.agentId, tool: toolName });
     log("info", "tool approval requested", { approvalId: id, agentId: caller.agentId, tool: toolName });
+    try {
+      this.onApprovalRequested?.({ id, agentId: caller.agentId, tool: toolName, target: JSON.stringify(params ?? {}).slice(0, 512), expiresAt });
+    } catch {
+      // push failures must never block the approval flow
+    }
     for (;;) {
       await new Promise((resolve) => setTimeout(resolve, this.pollMs));
       const row = this.store.getApproval(id) as { status: string; expires_at: string } | undefined;

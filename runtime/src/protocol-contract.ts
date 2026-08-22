@@ -15,7 +15,8 @@ export type BdsEventKind =
   | "agent/event" | "agent/status"
   | "tool/result" | "tool/list"
   | "workflow/event"
-  | "skill/loaded";
+  | "skill/loaded"
+  | "approval/pending";
 
 export interface BdsRequestEnvelope<T = unknown> {
   version: typeof BDS_PROTOCOL_VERSION;

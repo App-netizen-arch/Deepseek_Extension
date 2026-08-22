@@ -11,6 +11,7 @@
   import PreviewPanel from "./PreviewPanel.svelte";
   import ConfirmDialog from "./ConfirmDialog.svelte";
   import DeepCodeModal from "./DeepCodeModal.svelte";
+  import RuntimeApprovals from "./RuntimeApprovals.svelte";
   import ApiPlayground from "../api-playground/ApiPlayground.svelte";
   import appState from "../state.js";
 
@@ -168,6 +169,7 @@
 <SelectionOverlay />
 <StatusBanner />
 <AnnouncementBanner />
+<RuntimeApprovals />
 <PreviewPanel
   visible={previewVisible}
   title={previewTitle}

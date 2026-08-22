@@ -198,6 +198,7 @@ The agent orchestration layer lives in `src/agent/` and persists through the sha
 | `workflow/template.ts` | `{{path}}` interpolation over `{ input, ...stepsById }`; whole-string templates preserve value types, embedded ones stringify. |
 | `workflow/runner.ts` | Durable run engine (migration v5 `workflow_runs`): DAG scheduling with bounded concurrency, per-step retries/timeouts, `when` guards, `continue_on_error`, cancellation cascading through the supervisor agent. |
 | `agent/skill-loader.ts` | Skills (`SKILL.md` with YAML frontmatter: name/description/version/agents) discovered recursively under `<workspace>/.better-deepseek/skills` (`BDS_SKILLS_DIR`); matching skills are recorded in the agent's persisted `context.skills` and composed into its system prompt at launch. |
+| `security/permissions.ts` | Permission rule engine (migration v6 `permissions`): expiring per-agent/tool/resource-glob rules with deny > ask > allow precedence; explicit `allow` is the only way CRITICAL tools run. |
 | `scripts/bds.mjs` | CLI: `node scripts/bds.mjs skill add <file>` copies a skill into the skills directory; `skill list` prints discovered skills. |
 | `agent/demo-agent.ts` | `demo` type — logs "Hello, I am agent X" and completes; reference implementation for new types. |
 
@@ -310,6 +311,25 @@ POST /v1/skills/reload       -> refresh the runtime skill cache
 WS    tags text="<BDS:SKILL_LOAD name=...>" -> skill/loaded | runtime/error
 CLI  node scripts/bds.mjs skill add <file> | skill list
 ```
+
+### Permissions & Approvals
+
+Every tool invocation passes: registry -> enabled -> agent tool list -> **permission rules** -> default risk tier.
+
+- Rules (`POST /v1/permissions`): `{ tool, decision, agent_id?, path_pattern?, ttl_seconds?, granted_by? }`. Matching uses exact tool (or `*`), agent scope (unset = global), and glob resources (`src/**/*.rs`) extracted from `params.path` / `params.url`.
+- Precedence among matching rules is deny > ask > allow; expired rules are pruned lazily.
+- `allow` pre-consents HIGH actions and is the only way CRITICAL tools execute; `ask` forces approval even for LOW/MEDIUM; unmatched requests fall back to the shared risk policy.
+- HIGH/asked calls create a five-minute approval (`BDS_TOOL_APPROVAL_TTL_MS` overrides) that blocks the caller until decided; expired approvals auto-deny.
+
+```text
+GET    /approvals/pending        -> unresolved approvals (also pushed as WS approval/pending)
+POST   /approvals/:id            { decision: "approved" | "denied" }
+GET    /v1/permissions?agent_id=&tool=
+POST   /v1/permissions
+DELETE /v1/permissions/:id
+```
+
+The extension renders pending approvals as cards in chat (`RuntimeApprovals.svelte`, polled through the service worker via `chrome.runtime.sendMessage`; configure `bdsRuntimeUrl` / `bdsRuntimeToken` in extension storage).
 
 ### WebSocket commands
 

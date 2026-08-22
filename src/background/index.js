@@ -6,6 +6,7 @@ import {
   normalizeGitHubCommitCount,
 } from "../lib/github-commits.js";
 import { devLog } from "../lib/dev-log.js";
+import { listPendingApprovals, decideApproval } from "./runtime-client.js";
 
 export {
   DEFAULT_GITHUB_COMMIT_COUNT,
@@ -167,6 +168,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         ok: false,
         error: String(error && error.message ? error.message : error),
       }));
+    return true;
+  }
+
+  if (message.type === "BDS_RUNTIME_APPROVALS_LIST") {
+    listPendingApprovals()
+      .then((result) => sendResponse(result))
+      .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
+    return true;
+  }
+
+  if (message.type === "BDS_RUNTIME_APPROVAL_DECIDE") {
+    decideApproval(message.id, message.decision)
+      .then((result) => sendResponse(result))
+      .catch((error) => sendResponse({ ok: false, error: String(error && error.message ? error.message : error) }));
     return true;
   }
 

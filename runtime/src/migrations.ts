@@ -55,6 +55,19 @@ CREATE TABLE IF NOT EXISTS workflow_runs (
 );
 CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON workflow_runs(status, updated_at DESC);
 `},
+ {version:6,name:"permission_rules",sql:`
+CREATE TABLE IF NOT EXISTS permissions (
+  id TEXT PRIMARY KEY,
+  agent_id TEXT,
+  tool TEXT NOT NULL,
+  path_pattern TEXT,
+  decision TEXT NOT NULL CHECK(decision IN ('allow','deny','ask')),
+  granted_by TEXT NOT NULL,
+  expires_at TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_permissions_lookup ON permissions(agent_id, tool);
+`},
 ];
 export function migrate(db:Database.Database):void{db.exec(MIGRATIONS[0].sql);const applied=db.prepare("SELECT version FROM schema_migrations ORDER BY version").all() as Array<{version:number}>;const seen=new Set(applied.map(r=>r.version));for(const migration of MIGRATIONS){if(seen.has(migration.version))continue;const tx=db.transaction(()=>{db.exec(migration.sql);db.prepare("INSERT INTO schema_migrations(version,name,applied_at) VALUES(?,?,?)").run(migration.version,migration.name,new Date().toISOString());});try{tx();}catch(error){if(migration.version===2&&String(error).includes("duplicate column name")){db.exec("CREATE INDEX IF NOT EXISTS idx_audit_task_created ON audit_events(task_id,created_at);");db.prepare("INSERT INTO schema_migrations(version,name,applied_at) VALUES(?,?,?)").run(migration.version,migration.name,new Date().toISOString());}else throw error;}}}
 export function schemaVersion(db:Database.Database):number{const row=db.prepare("SELECT MAX(version) AS version FROM schema_migrations").get() as {version?:number}|undefined;return row?.version??0;}

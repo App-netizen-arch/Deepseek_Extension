@@ -28,6 +28,7 @@ import { log } from "./operational.js";
 import { WorkflowRunner } from "./workflow/runner.js";
 import { findWorkflow, loadWorkflowDefinitions } from "./workflow/loader.js";
 import { getSkillsForAgent, loadSkills, type Skill } from "./agent/skill-loader.js";
+import { PermissionStore } from "./security/permissions.js";
 
 const store = new RuntimeStore();
 const startedAt = Date.now();
@@ -47,7 +48,11 @@ for (const tool of createBuiltinTools({
 })) {
   toolRegistry.register(tool);
 }
-const toolService = new ToolInvocationService(toolRegistry, store, WORKSPACE);
+const permissionStore = new PermissionStore(store.db);
+const toolService = new ToolInvocationService(toolRegistry, store, WORKSPACE, {
+  permissions: permissionStore,
+  onApprovalRequested: (info) => broadcast({ type: "approval/pending", payload: info }),
+});
 const mcpServers = new Map<string, McpRemoteServer>();
 
 const agentRegistry = new AgentRegistry(store.db);
@@ -185,6 +190,11 @@ export function createRuntimeServer() {
       // ---- MCP servers ----
       if (req.method === "GET" && req.url === "/v1/mcp/servers") { json(res, 200, { ok: true, servers: [...mcpServers.values()] }); return; }
       if (req.method === "POST" && req.url === "/v1/mcp/connect") { const body = JSON.parse(await readBody(req)) as { name?: string; url?: string }; if (!body.name || !body.url) { json(res, 400, { ok: false, error: "name and url are required" }); return; } try { const count = await connectMcpServer({ name: body.name, url: body.url }); json(res, 200, { ok: true, server: body.name, tools_registered: count }); } catch (error) { json(res, 502, { ok: false, error: error instanceof Error ? error.message : "mcp connect failed" }); } return; }
+
+      // ---- Permission rules (Phase F) ----
+      if (req.method === "POST" && req.url === "/v1/permissions") { const body = JSON.parse(await readBody(req)) as { agent_id?: string; tool?: string; path_pattern?: string; decision?: "allow" | "deny" | "ask"; ttl_seconds?: number; granted_by?: string }; if (!body.tool || !body.decision) { json(res, 400, { ok: false, error: "tool and decision are required" }); return; } try { const rule = permissionStore.add({ tool: body.tool, decision: body.decision, ...(body.agent_id ? { agentId: body.agent_id } : {}), ...(body.path_pattern ? { pathPattern: body.path_pattern } : {}), ...(typeof body.ttl_seconds === "number" ? { ttlSeconds: body.ttl_seconds } : {}), ...(body.granted_by ? { grantedBy: body.granted_by } : {}) }); store.audit("permission.grant", { id: rule.id, tool: rule.tool, decision: rule.decision, agentId: rule.agentId ?? null }); json(res, 200, { ok: true, rule }); } catch (error) { json(res, 400, { ok: false, error: error instanceof Error ? error.message : "grant failed" }); } return; }
+      if (req.method === "GET" && req.url?.startsWith("/v1/permissions")) { const url = new URL(req.url, `http://${HOST}`); const agentId = url.searchParams.get("agent_id") ?? undefined; const tool = url.searchParams.get("tool") ?? undefined; json(res, 200, { ok: true, rules: permissionStore.list({ ...(agentId ? { agentId } : {}), ...(tool ? { tool } : {}) }) }); return; }
+      if (req.method === "DELETE" && req.url?.match(/^\/v1\/permissions\/[^/]+$/)) { const id = decodeURIComponent(req.url.slice("/v1/permissions/".length)); const removed = permissionStore.revoke(id); store.audit("permission.revoke", { id, removed }); json(res, removed ? 200 : 404, { ok: removed, id }); return; }
 
       // ---- Skills ----
       if (req.method === "GET" && req.url === "/v1/skills") { const all = await loadSkills(); json(res, 200, { ok: true, skills: all.map((s) => ({ name: s.name, description: s.description ?? null, version: s.version ?? null, agents: s.appliesTo.length > 0 ? s.appliesTo : ["*"], file: s.file, body_chars: s.body.length })) }); return; }

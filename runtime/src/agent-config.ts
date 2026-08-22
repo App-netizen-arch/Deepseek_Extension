@@ -31,7 +31,7 @@ export async function loadAgentConfig(): Promise<AgentConfig> {
   };
 }
 
-function glob(pattern: string, value: string): boolean {
+export function glob(pattern: string, value: string): boolean {
   let source = "^";
   for (let i = 0; i < pattern.length; i += 1) {
     const ch = pattern[i];
@@ -53,6 +53,9 @@ function glob(pattern: string, value: string): boolean {
   source += "$";
   return new RegExp(source).test(value);
 }
+
+/** Public alias for the shared glob matcher (used by the permission engine). */
+export const globMatch = glob;
 
 export function permitted(rules: PermissionRule[], tool: string, target = "") {
   const r = rules.find((x) => x.tool === tool);
